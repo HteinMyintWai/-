@@ -37,6 +37,9 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 95%; max-width: 450px; padding: 25px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
         .setting-box { background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #eee; text-align: left; }
+        .type-opt { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd; text-align: center; cursor: pointer; font-size: 0.8rem; }
+        .type-opt.selected.plus { background: var(--income); color: white; }
+        .type-opt.selected.minus { background: var(--expense); color: white; }
     </style>
 </head>
 <body>
@@ -85,21 +88,35 @@
 
 <div id="settingsModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0;">⚙️ Settings (ပိုင်ရှင်သုံးရန်)</h3>
+        <h3 style="margin-top:0;">⚙️ Settings</h3>
         
         <div class="setting-box">
+            <h4>📁 အမျိုးအစားများ စီမံရန်</h4>
+            <div id="catEditList" style="margin-bottom:15px; border-bottom: 1px solid #ddd; padding-bottom: 10px;"></div>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <div id="typePlus" class="type-opt selected plus" onclick="window.setNewCatType('plus')">ဝင်ငွေ (+)</div>
+                <div id="typeMinus" class="type-opt minus" onclick="window.setNewCatType('minus')">အသုံး (-)</div>
+            </div>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="newCatIcon" class="main-input" placeholder="🎁" style="width:25%; margin-bottom:0;">
+                <input type="text" id="newCatName" class="main-input" placeholder="အမည်" style="width:75%; margin-bottom:0;">
+            </div>
+            <button class="btn-submit" style="background:var(--income); padding:10px; margin-top:10px;" id="addCatBtn">အမျိုးအစားသစ်ထည့်မည်</button>
+        </div>
+
+        <div class="setting-box">
             <h4>🔐 User Accounts</h4>
-            <input type="text" id="newAdminUser" class="main-input" placeholder="Admin Username">
-            <input type="text" id="newAdminPass" class="main-input" placeholder="Admin Password">
+            <input type="text" id="newAdminUser" class="main-input" placeholder="Admin User">
+            <input type="text" id="newAdminPass" class="main-input" placeholder="Admin Pass">
             <hr>
-            <input type="text" id="newStaffUser" class="main-input" placeholder="Staff Username">
-            <input type="text" id="newStaffPass" class="main-input" placeholder="Staff Password">
+            <input type="text" id="newStaffUser" class="main-input" placeholder="Staff User">
+            <input type="text" id="newStaffPass" class="main-input" placeholder="Staff Pass">
             <button class="btn-submit" style="padding:10px;" id="saveAccBtn">အကောင့်များသိမ်းမည်</button>
         </div>
 
         <div class="setting-box">
             <h4>💰 မူလလက်ကျန်ငွေ</h4>
-            <input type="number" id="openingBalInput" class="main-input" placeholder="Opening Balance">
+            <input type="number" id="openingBalInput" class="main-input">
             <button class="btn-submit" style="background:#636e72; padding:10px;" id="saveOpenBtn">သိမ်းမည်</button>
         </div>
 
@@ -111,7 +128,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ပေးထားသော Config အသစ်ကို အသုံးပြုထားပါတယ်
     const firebaseConfig = {
         apiKey: "AIzaSyAo0NxlLIUtWzIJJx8Ein5Ftidacw0W9Lw",
         authDomain: "myrecordsystem-af249.firebaseapp.com",
@@ -125,18 +141,19 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- State & Variables ---
+    // --- State ---
     let records = [];
+    let categories = [
+        { id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" },
+        { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }
+    ];
     let isAdmin = false;
     let selectedCatId = 1;
     let openingBal = 0;
     let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
-    const categories = [
-        { id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" },
-        { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }
-    ];
+    let newCatType = 'plus';
 
-    // --- Firebase Sync ---
+    // --- Sync Firebase ---
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
         records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderUI();
@@ -149,12 +166,32 @@
             const data = docSnap.data();
             openingBal = data.openingBal || 0;
             loginConfigs = data.loginConfigs || loginConfigs;
+            if(data.categories) categories = data.categories;
         }
+        renderUI();
     }
     loadCloudSettings();
 
-    // --- Core Functions ---
+    // --- Window Functions ---
     window.setCat = (id) => { selectedCatId = id; renderUI(); };
+    window.setNewCatType = (t) => { 
+        newCatType = t; 
+        document.getElementById('typePlus').classList.toggle('selected', t === 'plus');
+        document.getElementById('typeMinus').classList.toggle('selected', t === 'minus');
+    };
+    window.deleteRec = async (id) => { if(confirm("ဤစာရင်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
+    window.removeCat = async (id) => {
+        if(confirm("ဤအမျိုးအစားကို ဖျက်မှာလား?")) {
+            categories = categories.filter(c => c.id !== id);
+            await saveSettingsToCloud();
+            renderUI();
+            renderEditCats();
+        }
+    };
+
+    async function saveSettingsToCloud() {
+        await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal, categories }, { merge: true });
+    }
 
     function renderUI() {
         const catRow = document.getElementById('catRow');
@@ -183,7 +220,15 @@
         document.getElementById('dayOutDisplay').innerText = dOut.toLocaleString();
     }
 
-    // --- Event Handlers ---
+    function renderEditCats() {
+        document.getElementById('catEditList').innerHTML = categories.map(c => `
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
+                <span>${c.icon} ${c.name} (${c.type === 'plus' ? 'ဝင်ငွေ' : 'အသုံး'})</span>
+                <span style="color:red; cursor:pointer;" onclick="window.removeCat(${c.id})">✖</span>
+            </div>`).join('');
+    }
+
+    // --- Buttons ---
     document.getElementById('loginBtn').onclick = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
@@ -196,7 +241,6 @@
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         document.getElementById('roleDisplay').innerText = "Role: " + role;
-        // Staff ဆိုရင် Setting ခလုတ်ကို ဖျောက်ထားမယ်
         if(!isAdmin) document.getElementById('settingBtn').style.display = 'none';
         renderUI();
     }
@@ -205,59 +249,51 @@
         const amt = parseFloat(document.getElementById('itemAmt').value);
         if(!amt) return alert("ပမာဏ ထည့်ပါ");
         const c = categories.find(x => x.id === selectedCatId);
-        try {
-            await addDoc(collection(db, "records"), {
-                name: document.getElementById('itemName').value || "မှတ်ချက်မရှိ",
-                amt: amt, catName: c.name, icon: c.icon, type: c.type, timestamp: Date.now()
-            });
-            document.getElementById('itemAmt').value = ''; 
-            document.getElementById('itemName').value = '';
-        } catch (e) { alert("Error: " + e.message); }
+        if(!c) return alert("အမျိုးအစား ရွေးပါ");
+        await addDoc(collection(db, "records"), {
+            name: document.getElementById('itemName').value || "မှတ်ချက်မရှိ",
+            amt: amt, catName: c.name, icon: c.icon, type: c.type, timestamp: Date.now()
+        });
+        document.getElementById('itemAmt').value = ''; document.getElementById('itemName').value = '';
     };
 
-    window.deleteRec = async (id) => { if(confirm("ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
+    document.getElementById('addCatBtn').onclick = async () => {
+        const name = document.getElementById('newCatName').value;
+        if(!name) return alert("အမည်ထည့်ပါ");
+        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "🎁", name, type: newCatType });
+        await saveSettingsToCloud();
+        document.getElementById('newCatName').value = '';
+        renderEditCats(); renderUI();
+    };
 
-    // --- Settings Modal Logic ---
     document.getElementById('settingBtn').onclick = () => {
+        document.getElementById('openingBalInput').value = openingBal;
         document.getElementById('newAdminUser').value = loginConfigs.admin.u;
         document.getElementById('newAdminPass').value = loginConfigs.admin.p;
         document.getElementById('newStaffUser').value = loginConfigs.staff.u;
         document.getElementById('newStaffPass').value = loginConfigs.staff.p;
-        document.getElementById('openingBalInput').value = openingBal;
+        renderEditCats();
         document.getElementById('settingsModal').style.display = 'flex';
     };
-
-    document.getElementById('closeSettings').onclick = () => { document.getElementById('settingsModal').style.display = 'none'; };
 
     document.getElementById('saveAccBtn').onclick = async () => {
         loginConfigs.admin.u = document.getElementById('newAdminUser').value;
         loginConfigs.admin.p = document.getElementById('newAdminPass').value;
         loginConfigs.staff.u = document.getElementById('newStaffUser').value;
         loginConfigs.staff.p = document.getElementById('newStaffPass').value;
-        await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal }, { merge: true });
-        alert("Account များကို Cloud သို့ သိမ်းဆည်းပြီးပါပြီ!");
+        await saveSettingsToCloud(); alert("Saved!");
     };
 
     document.getElementById('saveOpenBtn').onclick = async () => {
         openingBal = parseFloat(document.getElementById('openingBalInput').value) || 0;
-        await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal }, { merge: true });
-        renderUI();
-        alert("မူလလက်ကျန်ငွေကို သိမ်းဆည်းပြီးပါပြီ!");
+        await saveSettingsToCloud(); renderUI(); alert("Saved!");
     };
 
-    // --- Status Update ---
-    window.addEventListener('online', () => { 
-        document.getElementById('statusIndicator').className = "online"; 
-        document.getElementById('statusIndicator').innerText = "Online 🟢"; 
-    });
-    window.addEventListener('offline', () => { 
-        document.getElementById('statusIndicator').className = "offline"; 
-        document.getElementById('statusIndicator').innerText = "Offline 🔴"; 
-    });
-    if(navigator.onLine) { 
-        document.getElementById('statusIndicator').className = "online"; 
-        document.getElementById('statusIndicator').innerText = "Online 🟢"; 
-    }
+    document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
+
+    window.addEventListener('online', () => { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; });
+    window.addEventListener('offline', () => { document.getElementById('statusIndicator').className="offline"; document.getElementById('statusIndicator').innerText="Offline 🔴"; });
+    if(navigator.onLine) { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; }
 </script>
 </body>
 </html>
