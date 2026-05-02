@@ -8,10 +8,9 @@
         :root { --primary: #4834d4; --income: #00b894; --expense: #eb4d4b; --dark: #2d3436; --white: #ffffff; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        /* Connection Status */
-        #statusIndicator { position: fixed; top: 10px; right: 10px; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; z-index: 10001; transition: 0.3s; }
-        .online { background: #e3fcef; color: #00b894; border: 1px solid #00b894; }
-        .offline { background: #ffe9e9; color: #eb4d4b; border: 1px solid #eb4d4b; }
+        #statusIndicator { position: fixed; top: 10px; right: 10px; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; z-index: 10001; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .online { background: #dff9fb; color: #00b894; border: 1px solid #00b894; }
+        .offline { background: #fab1a0; color: #d63031; border: 1px solid #d63031; }
 
         #loginOverlay { position: fixed; inset: 0; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 10000; }
         .login-card { background: white; padding: 35px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; }
@@ -32,8 +31,12 @@
         .main-input { width: 100%; padding: 16px; border: 1.5px solid #eee; border-radius: 15px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
-        .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
         .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.1rem; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 95%; max-width: 450px; padding: 25px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
+        .setting-box { background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #eee; text-align: left; }
     </style>
 </head>
 <body>
@@ -54,7 +57,9 @@
     <div class="header-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div id="roleDisplay" style="font-size:0.8rem; opacity:0.8;">Role: Loading...</div>
-            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">⚙️</button>
+            <div style="display:flex; gap:10px;">
+                <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">⚙️</button>
+            </div>
         </div>
         <div style="margin-top:10px;">စုစုပေါင်းလက်ကျန်ငွေ</div>
         <div class="bal-val"><span id="totalDisplay">0</span></div>
@@ -78,12 +83,34 @@
     <button class="btn-submit" style="background:var(--dark); margin-top:20px;" onclick="location.reload()">🚪 Logout ထွက်မည်</button>
 </div>
 
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0;">⚙️ Settings (ပိုင်ရှင်သုံးရန်)</h3>
+        
+        <div class="setting-box">
+            <h4>🔐 User Accounts</h4>
+            <input type="text" id="newAdminUser" class="main-input" placeholder="Admin Username">
+            <input type="text" id="newAdminPass" class="main-input" placeholder="Admin Password">
+            <hr>
+            <input type="text" id="newStaffUser" class="main-input" placeholder="Staff Username">
+            <input type="text" id="newStaffPass" class="main-input" placeholder="Staff Password">
+            <button class="btn-submit" style="padding:10px;" id="saveAccBtn">အကောင့်များသိမ်းမည်</button>
+        </div>
+
+        <div class="setting-box">
+            <h4>💰 မူလလက်ကျန်ငွေ</h4>
+            <input type="number" id="openingBalInput" class="main-input" placeholder="Opening Balance">
+            <button class="btn-submit" style="background:#636e72; padding:10px;" id="saveOpenBtn">သိမ်းမည်</button>
+        </div>
+
+        <button class="btn-submit" style="background:#ccc; color:#333;" id="closeSettings">ပိတ်မည်</button>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ပေးပို့ထားသော Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyAo0NxlLIUtWzIJJx8Ein5Ftidacw0W9Lw",
         authDomain: "myrecordsystem-af249.firebaseapp.com",
@@ -94,57 +121,39 @@
         measurementId: "G-DT9N6G4MQS"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
-    // --- Connection Status Sync ---
-    const statusDiv = document.getElementById('statusIndicator');
-    function updateStatus() {
-        if(navigator.onLine) {
-            statusDiv.innerText = "Cloud Online 🟢";
-            statusDiv.className = "online";
-        } else {
-            statusDiv.innerText = "Cloud Offline 🔴";
-            statusDiv.className = "offline";
-        }
-    }
-    window.addEventListener('online', updateStatus);
-    window.addEventListener('offline', updateStatus);
-    updateStatus();
-
-    // --- State & Config ---
+    // --- State & Variables ---
     let records = [];
     let isAdmin = false;
     let selectedCatId = 1;
+    let openingBal = 0;
+    let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
     const categories = [
         { id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" },
         { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }
     ];
 
-    // Firestore Real-time Sync
+    // --- Firebase Sync ---
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
         records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderUI();
     });
 
-    // Login logic
-    window.handleLogin = () => {
-        const u = document.getElementById('userInput').value;
-        const p = document.getElementById('passInput').value;
-        // Default login: admin/1234 or staff/5678
-        if(u === "admin" && p === "1234") { isAdmin = true; startApp("Admin"); }
-        else if(u === "staff" && p === "5678") { isAdmin = false; startApp("Staff"); }
-        else { document.getElementById('loginError').style.display = 'block'; }
-    };
-
-    function startApp(role) {
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        document.getElementById('roleDisplay').innerText = "Role: " + role;
-        renderUI();
+    async function loadCloudSettings() {
+        const docRef = doc(db, "settings", "main_config");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            openingBal = data.openingBal || 0;
+            loginConfigs = data.loginConfigs || loginConfigs;
+        }
     }
+    loadCloudSettings();
+
+    // --- Core Functions ---
+    window.setCat = (id) => { selectedCatId = id; renderUI(); };
 
     function renderUI() {
         const catRow = document.getElementById('catRow');
@@ -168,14 +177,29 @@
                     ${isAdmin ? `<button class="del-btn" onclick="window.deleteRec('${r.id}')">✖</button>` : ''}
                 </div></div>`;
         });
-        document.getElementById('totalDisplay').innerText = net.toLocaleString();
+        document.getElementById('totalDisplay').innerText = (openingBal + net).toLocaleString();
         document.getElementById('dayInDisplay').innerText = dIn.toLocaleString();
         document.getElementById('dayOutDisplay').innerText = dOut.toLocaleString();
     }
 
-    window.setCat = (id) => { selectedCatId = id; renderUI(); };
+    // --- Event Handlers ---
+    document.getElementById('loginBtn').onclick = () => {
+        const u = document.getElementById('userInput').value;
+        const p = document.getElementById('passInput').value;
+        if(u === loginConfigs.admin.u && p === loginConfigs.admin.p) { isAdmin = true; startApp("Admin"); }
+        else if(u === loginConfigs.staff.u && p === loginConfigs.staff.p) { isAdmin = false; startApp("Staff"); }
+        else { document.getElementById('loginError').style.display = 'block'; }
+    };
 
-    window.saveData = async () => {
+    function startApp(role) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('roleDisplay').innerText = "Role: " + role;
+        if(!isAdmin) document.getElementById('settingBtn').style.display = 'none';
+        renderUI();
+    }
+
+    document.getElementById('saveBtn').onclick = async () => {
         const amt = parseFloat(document.getElementById('itemAmt').value);
         if(!amt) return alert("ပမာဏ ထည့်ပါ");
         const c = categories.find(x => x.id === selectedCatId);
@@ -186,15 +210,43 @@
             });
             document.getElementById('itemAmt').value = ''; 
             document.getElementById('itemName').value = '';
-        } catch (e) { alert("Error: Database ချိတ်ဆက်မှု မရှိသေးပါ။"); }
+        } catch (e) { alert("Error: " + e.message); }
     };
 
     window.deleteRec = async (id) => { if(confirm("ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
 
-    // Event Listeners
-    document.getElementById('loginBtn').onclick = window.handleLogin;
-    document.getElementById('saveBtn').onclick = window.saveData;
+    // --- Settings Modal Logic ---
+    document.getElementById('settingBtn').onclick = () => {
+        document.getElementById('newAdminUser').value = loginConfigs.admin.u;
+        document.getElementById('newAdminPass').value = loginConfigs.admin.p;
+        document.getElementById('newStaffUser').value = loginConfigs.staff.u;
+        document.getElementById('newStaffPass').value = loginConfigs.staff.p;
+        document.getElementById('openingBalInput').value = openingBal;
+        document.getElementById('settingsModal').style.display = 'flex';
+    };
+
+    document.getElementById('closeSettings').onclick = () => { document.getElementById('settingsModal').style.display = 'none'; };
+
+    document.getElementById('saveAccBtn').onclick = async () => {
+        loginConfigs.admin.u = document.getElementById('newAdminUser').value;
+        loginConfigs.admin.p = document.getElementById('newAdminPass').value;
+        loginConfigs.staff.u = document.getElementById('newStaffUser').value;
+        loginConfigs.staff.p = document.getElementById('newStaffPass').value;
+        await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal }, { merge: true });
+        alert("Accounts Saved to Cloud!");
+    };
+
+    document.getElementById('saveOpenBtn').onclick = async () => {
+        openingBal = parseFloat(document.getElementById('openingBalInput').value) || 0;
+        await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal }, { merge: true });
+        renderUI();
+        alert("Opening Balance Saved!");
+    };
+
+    // --- Status Update ---
+    window.addEventListener('online', () => { document.getElementById('statusIndicator').className = "online"; document.getElementById('statusIndicator').innerText = "Online 🟢"; });
+    window.addEventListener('offline', () => { document.getElementById('statusIndicator').className = "offline"; document.getElementById('statusIndicator').innerText = "Offline 🔴"; });
+    if(navigator.onLine) { document.getElementById('statusIndicator').className = "online"; document.getElementById('statusIndicator').innerText = "Online 🟢"; }
 </script>
 </body>
 </html>
-
