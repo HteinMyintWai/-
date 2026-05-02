@@ -32,8 +32,8 @@
         .main-input { width: 100%; padding: 16px; border: 1.5px solid #eee; border-radius: 15px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
-        .report-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .report-table th, .report-table td { padding: 12px 8px; border-bottom: 1px solid #eee; text-align: left; }
+        .report-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .report-table th, .report-table td { padding: 10px 5px; border-bottom: 1px solid #eee; text-align: left; }
         .report-table th { background: #f8f9fa; color: #666; }
 
         .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
@@ -79,7 +79,7 @@
         <div>အသုံး: <span id="dayOutDisplay" style="color:var(--expense)">0</span></div>
     </div>
 
-    <button class="btn-report" id="annualReportBtn">📊 နှစ်ချုပ်မှတ်တမ်းကြည့်ရန်</button>
+    <button class="btn-report" id="annualReportBtn">📊 ၂၀၂၆ နှစ်ချုပ်မှတ်တမ်း</button>
 
     <div class="card">
         <div class="cat-scroll" id="catRow"></div>
@@ -95,10 +95,20 @@
 
 <div id="annualModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; color:var(--primary);">📈 ၂၀၂၆ နှစ်ချုပ်စာရင်း</h3>
+        <h3 style="margin-top:0; color:var(--primary);">📈 ၂၀၂၆ တစ်နှစ်တာ အနှစ်ချုပ်</h3>
         <table class="report-table">
-            <thead><tr><th>လ</th><th>ဝင်ငွေ</th><th>အသုံး</th><th>အမြတ်</th></tr></thead>
+            <thead>
+                <tr><th>လ</th><th style="color:var(--income)">ဝင်ငွေ</th><th style="color:var(--expense)">အသုံး</th><th>အမြတ်</th></tr>
+            </thead>
             <tbody id="annualBody"></tbody>
+            <tfoot>
+                <tr style="background:#eee; font-weight:bold;">
+                    <td>စုစုပေါင်း</td>
+                    <td id="totalInYear" style="color:var(--income)">0</td>
+                    <td id="totalOutYear" style="color:var(--expense)">0</td>
+                    <td id="totalProfitYear">0</td>
+                </tr>
+            </tfoot>
         </table>
         <button class="btn-submit" style="background:#ccc; color:#333; margin-top:20px;" onclick="document.getElementById('annualModal').style.display='none'">ပြန်ပိတ်မည်</button>
     </div>
@@ -107,7 +117,6 @@
 <div id="settingsModal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0;">⚙️ Settings</h3>
-        
         <div class="setting-box">
             <h4 style="margin-top:0;">📁 အမျိုးအစားများ စီမံရန်</h4>
             <div id="catEditList" style="margin-bottom:15px; border: 1px solid #eee; padding: 10px; border-radius: 15px; max-height: 150px; overflow-y: auto;"></div>
@@ -157,7 +166,6 @@
     let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
     let categories = [{ id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" }, { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }];
 
-    // --- Firebase Sync ---
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
         records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderUI();
@@ -169,7 +177,6 @@
             const data = docSnap.data();
             openingBal = data.openingBal || 0;
             if(data.categories) categories = data.categories;
-            if(data.loginConfigs) loginConfigs = data.loginConfigs;
         }
         renderUI();
     }
@@ -179,7 +186,6 @@
         await setDoc(doc(db, "settings", "main_config"), { openingBal, categories, loginConfigs }, { merge: true });
     }
 
-    // --- UI Logic ---
     window.setCat = (id) => { selectedCatId = id; renderUI(); };
     window.setNewType = (type) => {
         newCatType = type;
@@ -214,7 +220,6 @@
         document.getElementById('dayOutDisplay').innerText = dOut.toLocaleString();
     }
 
-    // --- Actions ---
     document.getElementById('loginBtn').onclick = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
@@ -244,19 +249,30 @@
 
     document.getElementById('annualReportBtn').onclick = () => {
         let mData = Array(12).fill(0).map(() => ({ in: 0, out: 0 }));
+        let totalYearIn = 0, totalYearOut = 0;
+
         records.forEach(r => {
             const m = new Date(r.timestamp).getMonth();
-            if(r.type === 'plus') mData[m].in += r.amt; else mData[m].out += r.amt;
+            if(r.type === 'plus') { mData[m].in += r.amt; totalYearIn += r.amt; }
+            else { mData[m].out += r.amt; totalYearOut += r.amt; }
         });
-        const mNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+        const mNames = ["ဇန်နဝါရီ","ဖေဖော်ဝါရီ","မတ်","ဧပြီ","မေ","ဇွန်","ဇူလိုင်","သြဂုတ်","စက်တင်ဘာ","အောက်တိုဘာ","နိုဝင်ဘာ","ဒီဇင်ဘာ"];
         document.getElementById('annualBody').innerHTML = mData.map((m, i) => `
-            <tr><td>${mNames[i]}</td><td style="color:var(--income)">${m.in.toLocaleString()}</td>
-            <td style="color:var(--expense)">${m.out.toLocaleString()}</td><td><b>${(m.in-m.out).toLocaleString()}</b></td></tr>
+            <tr>
+                <td>${mNames[i]}</td>
+                <td style="color:var(--income)">${m.in.toLocaleString()}</td>
+                <td style="color:var(--expense)">${m.out.toLocaleString()}</td>
+                <td style="font-weight:bold;">${(m.in-m.out).toLocaleString()}</td>
+            </tr>
         `).join('');
+
+        document.getElementById('totalInYear').innerText = totalYearIn.toLocaleString();
+        document.getElementById('totalOutYear').innerText = totalYearOut.toLocaleString();
+        document.getElementById('totalProfitYear').innerText = (totalYearIn - totalYearOut).toLocaleString();
         document.getElementById('annualModal').style.display = 'flex';
     };
 
-    // --- Settings Actions ---
     document.getElementById('settingBtn').onclick = () => {
         document.getElementById('openingBalInput').value = openingBal;
         renderEditCats();
