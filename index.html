@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Business Wallet 2026 - Master Pro</title>
+    <title>Smart Business Wallet 2026 - Final Pro</title>
     <style>
         :root { --primary: #4834d4; --income: #00b894; --expense: #eb4d4b; --dark: #2d3436; --white: #ffffff; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        #statusIndicator { position: fixed; top: 10px; right: 10px; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; z-index: 10001; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        /* Status Bar */
+        #statusIndicator { position: fixed; top: 10px; right: 10px; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; z-index: 10001; }
         .online { background: #dff9fb; color: #00b894; border: 1px solid #00b894; }
         .offline { background: #fab1a0; color: #d63031; border: 1px solid #d63031; }
 
+        /* Login */
         #loginOverlay { position: fixed; inset: 0; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 10000; }
         .login-card { background: white; padding: 35px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; }
         .login-card input { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 15px; box-sizing: border-box; outline: none; }
         
+        /* Main UI */
         .app-container { max-width: 500px; margin: auto; padding: 15px; display: none; }
         .header-card { background: linear-gradient(135deg, #341f97, #4834d4); color: white; padding: 30px 20px; border-radius: 30px; text-align: center; margin-bottom: 10px; position: relative; }
         .bal-val { font-size: 2.8rem; font-weight: 800; margin: 10px 0; }
         
         .daily-summary { background: var(--dark); color: white; display: grid; grid-template-columns: 1fr 1fr; padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 15px; }
-        .btn-report { background: #6c5ce7; color: white; padding: 12px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
+        .btn-report { background: #6c5ce7; color: white; padding: 15px; border: none; border-radius: 20px; width: 100%; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 1rem; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
 
         .card { background: var(--white); border-radius: 25px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .cat-scroll { overflow-x: auto; white-space: nowrap; margin-bottom: 15px; padding-bottom: 5px; display: flex; gap: 10px; }
@@ -32,13 +35,15 @@
         .main-input { width: 100%; padding: 16px; border: 1.5px solid #eee; border-radius: 15px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
+        /* Table */
         .report-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .report-table th, .report-table td { padding: 10px 5px; border-bottom: 1px solid #eee; text-align: left; }
+        .report-table th, .report-table td { padding: 12px 5px; border-bottom: 1px solid #eee; text-align: left; }
         .report-table th { background: #f8f9fa; color: #666; }
 
         .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
         .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.1rem; }
 
+        /* Modals */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 95%; max-width: 450px; padding: 25px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
         .setting-box { background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #eee; }
@@ -67,7 +72,7 @@
     <div class="header-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div id="roleDisplay" style="font-size:0.8rem; opacity:0.8;">Role: Loading...</div>
-            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.4rem;">⚙️</button>
+            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.4rem; cursor:pointer;">⚙️</button>
         </div>
         <div style="margin-top:10px;">စုစုပေါင်းလက်ကျန်ငွေ</div>
         <div class="bal-val"><span id="totalDisplay">0</span></div>
@@ -79,7 +84,7 @@
         <div>အသုံး: <span id="dayOutDisplay" style="color:var(--expense)">0</span></div>
     </div>
 
-    <button class="btn-report" id="annualReportBtn">📊 ၂၀၂၆ နှစ်ချုပ်မှတ်တမ်း</button>
+    <button class="btn-report" id="annualReportBtn">📊 ၂၀၂၆ နှစ်ချုပ်မှတ်တမ်းကြည့်ရန်</button>
 
     <div class="card">
         <div class="cat-scroll" id="catRow"></div>
@@ -95,21 +100,23 @@
 
 <div id="annualModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; color:var(--primary);">📈 ၂၀၂၆ တစ်နှစ်တာ အနှစ်ချုပ်</h3>
-        <table class="report-table">
-            <thead>
-                <tr><th>လ</th><th style="color:var(--income)">ဝင်ငွေ</th><th style="color:var(--expense)">အသုံး</th><th>အမြတ်</th></tr>
-            </thead>
-            <tbody id="annualBody"></tbody>
-            <tfoot>
-                <tr style="background:#eee; font-weight:bold;">
-                    <td>စုစုပေါင်း</td>
-                    <td id="totalInYear" style="color:var(--income)">0</td>
-                    <td id="totalOutYear" style="color:var(--expense)">0</td>
-                    <td id="totalProfitYear">0</td>
-                </tr>
-            </tfoot>
-        </table>
+        <h3 style="margin-top:0; color:var(--primary);">📈 ၂၀၂၆ နှစ်ချုပ် အကျဉ်းချုပ်</h3>
+        <div style="overflow-x:auto;">
+            <table class="report-table">
+                <thead>
+                    <tr><th>လ</th><th style="color:var(--income)">ဝင်ငွေ</th><th style="color:var(--expense)">အသုံး</th><th>အမြတ်</th></tr>
+                </thead>
+                <tbody id="annualBody"></tbody>
+                <tfoot>
+                    <tr style="background:#eee; font-weight:bold;">
+                        <td>စုစုပေါင်း</td>
+                        <td id="totalInYear" style="color:var(--income)">0</td>
+                        <td id="totalOutYear" style="color:var(--expense)">0</td>
+                        <td id="totalProfitYear">0</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
         <button class="btn-submit" style="background:#ccc; color:#333; margin-top:20px;" onclick="document.getElementById('annualModal').style.display='none'">ပြန်ပိတ်မည်</button>
     </div>
 </div>
@@ -117,6 +124,7 @@
 <div id="settingsModal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0;">⚙️ Settings</h3>
+        
         <div class="setting-box">
             <h4 style="margin-top:0;">📁 အမျိုးအစားများ စီမံရန်</h4>
             <div id="catEditList" style="margin-bottom:15px; border: 1px solid #eee; padding: 10px; border-radius: 15px; max-height: 150px; overflow-y: auto;"></div>
@@ -129,6 +137,16 @@
                 <input type="text" id="newCatName" class="main-input" placeholder="အမည်" style="width:70%;">
             </div>
             <button class="btn-submit" style="background:var(--income); padding:12px;" id="addCatBtn">➕ အမျိုးအစားသစ်ထည့်မည်</button>
+        </div>
+
+        <div class="setting-box">
+            <h4 style="margin-top:0;">🔐 အကောင့်များ ပြောင်းရန်</h4>
+            <input type="text" id="newAdminUser" class="main-input" placeholder="Admin Username">
+            <input type="text" id="newAdminPass" class="main-input" placeholder="Admin Password">
+            <hr>
+            <input type="text" id="newStaffUser" class="main-input" placeholder="Staff Username">
+            <input type="text" id="newStaffPass" class="main-input" placeholder="Staff Password">
+            <button class="btn-submit" style="padding:12px;" id="saveAccBtn">အကောင့်များသိမ်းမည်</button>
         </div>
 
         <div class="setting-box">
@@ -164,28 +182,34 @@
     let openingBal = 0;
     let newCatType = 'plus';
     let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
-    let categories = [{ id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" }, { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }];
+    let categories = [
+        { id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" },
+        { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }
+    ];
 
+    // --- Sync Firebase ---
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
         records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderUI();
     });
 
-    async function loadSettings() {
+    async function loadConfig() {
         const docSnap = await getDoc(doc(db, "settings", "main_config"));
         if (docSnap.exists()) {
             const data = docSnap.data();
             openingBal = data.openingBal || 0;
             if(data.categories) categories = data.categories;
+            if(data.loginConfigs) loginConfigs = data.loginConfigs;
         }
         renderUI();
     }
-    loadSettings();
+    loadConfig();
 
-    async function saveCloudSettings() {
+    async function saveConfig() {
         await setDoc(doc(db, "settings", "main_config"), { openingBal, categories, loginConfigs }, { merge: true });
     }
 
+    // --- UI Rendering ---
     window.setCat = (id) => { selectedCatId = id; renderUI(); };
     window.setNewType = (type) => {
         newCatType = type;
@@ -194,6 +218,7 @@
     };
 
     function renderUI() {
+        // Render Categories
         const catRow = document.getElementById('catRow');
         catRow.innerHTML = categories.map(c => `
             <div class="cat-item ${c.id === selectedCatId ? 'active ' + c.type : ''}" onclick="window.setCat(${c.id})">
@@ -220,6 +245,7 @@
         document.getElementById('dayOutDisplay').innerText = dOut.toLocaleString();
     }
 
+    // --- Buttons & Actions ---
     document.getElementById('loginBtn').onclick = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
@@ -273,24 +299,29 @@
         document.getElementById('annualModal').style.display = 'flex';
     };
 
+    // --- Settings ---
     document.getElementById('settingBtn').onclick = () => {
         document.getElementById('openingBalInput').value = openingBal;
+        document.getElementById('newAdminUser').value = loginConfigs.admin.u;
+        document.getElementById('newAdminPass').value = loginConfigs.admin.p;
+        document.getElementById('newStaffUser').value = loginConfigs.staff.u;
+        document.getElementById('newStaffPass').value = loginConfigs.staff.p;
         renderEditCats();
         document.getElementById('settingsModal').style.display = 'flex';
     };
 
     function renderEditCats() {
         document.getElementById('catEditList').innerHTML = categories.map(c => `
-            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
+            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; align-items:center;">
                 <span>${c.icon} ${c.name} (${c.type})</span>
-                <span style="color:red; cursor:pointer;" onclick="window.removeCat(${c.id})">✖</span>
+                <span style="color:red; cursor:pointer; font-weight:bold; padding:5px;" onclick="window.removeCat(${c.id})">✖</span>
             </div>`).join('');
     }
 
     window.removeCat = async (id) => {
-        if(confirm("ဖျက်မှာလား?")) {
+        if(confirm("ဤအမျိုးအစားကို ဖျက်မှာလား?")) {
             categories = categories.filter(c => c.id !== id);
-            await saveCloudSettings(); renderEditCats(); renderUI();
+            await saveConfig(); renderEditCats(); renderUI();
         }
     };
 
@@ -298,18 +329,27 @@
         const name = document.getElementById('newCatName').value;
         if(!name) return alert("အမည်ထည့်ပါ");
         categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "🎁", name, type: newCatType });
-        await saveCloudSettings(); renderEditCats(); renderUI();
+        await saveConfig(); renderEditCats(); renderUI();
         document.getElementById('newCatName').value = '';
+    };
+
+    document.getElementById('saveAccBtn').onclick = async () => {
+        loginConfigs.admin.u = document.getElementById('newAdminUser').value;
+        loginConfigs.admin.p = document.getElementById('newAdminPass').value;
+        loginConfigs.staff.u = document.getElementById('newStaffUser').value;
+        loginConfigs.staff.p = document.getElementById('newStaffPass').value;
+        await saveConfig(); alert("အကောင့်များ သိမ်းဆည်းပြီးပါပြီ");
     };
 
     document.getElementById('saveOpenBtn').onclick = async () => {
         openingBal = parseFloat(document.getElementById('openingBalInput').value) || 0;
-        await saveCloudSettings(); renderUI(); alert("သိမ်းဆည်းပြီးပါပြီ");
+        await saveConfig(); renderUI(); alert("မူလလက်ကျန်ငွေ သိမ်းဆည်းပြီးပါပြီ");
     };
 
     window.deleteRec = async (id) => { if(confirm("ဤစာရင်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
     document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
 
+    // Status
     window.addEventListener('online', () => { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; });
     window.addEventListener('offline', () => { document.getElementById('statusIndicator').className="offline"; document.getElementById('statusIndicator').innerText="Offline 🔴"; });
     if(navigator.onLine) { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; }
