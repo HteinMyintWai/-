@@ -31,6 +31,11 @@
         .main-input { width: 100%; padding: 16px; border: 1.5px solid #eee; border-radius: 15px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
+        /* Annual Table Styling */
+        .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        .report-table th, .report-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .report-table th { background: #f8f9fa; color: #666; }
+
         .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
         .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.1rem; }
 
@@ -75,6 +80,18 @@
     </div>
 
     <div class="card">
+        <h4 style="margin-top:0; color:var(--primary);">📊 ၂၀၂၆ နှစ်ချုပ်စာရင်း</h4>
+        <div style="overflow-x:auto;">
+            <table class="report-table">
+                <thead>
+                    <tr><th>လ</th><th>ဝင်ငွေ</th><th>အသုံး</th><th>အမြတ်</th></tr>
+                </thead>
+                <tbody id="annualBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
         <div class="cat-scroll" id="catRow"></div>
         <input type="text" id="itemName" class="main-input" placeholder="အကြောင်းအရာ">
         <input type="number" id="itemAmt" class="main-input" placeholder="ပမာဏ (ကျပ်)">
@@ -92,15 +109,14 @@
         
         <div class="setting-box">
             <h4 style="margin-top:0;">📁 အမျိုးအစားများ စီမံရန်</h4>
-            <div id="catEditList" style="margin-bottom:15px; border: 1px solid #eee; padding: 10px; border-radius: 15px; max-height: 150px; overflow-y: auto;">
-                </div>
+            <div id="catEditList" style="margin-bottom:15px; border: 1px solid #eee; padding: 10px; border-radius: 15px; max-height: 150px; overflow-y: auto;"></div>
             <div class="type-selector">
                 <div id="typePlus" class="type-btn active plus" onclick="window.setNewType('plus')">ဝင်ငွေ (+)</div>
                 <div id="typeMinus" class="type-btn minus" onclick="window.setNewType('minus')">အသုံး (-)</div>
             </div>
             <div style="display:flex; gap:5px;">
                 <input type="text" id="newCatIcon" class="main-input" placeholder="🎁" style="width:30%;">
-                <input type="text" id="newCatName" class="main-input" placeholder="အမျိုးအစားအမည်" style="width:70%;">
+                <input type="text" id="newCatName" class="main-input" placeholder="အမည်" style="width:70%;">
             </div>
             <button class="btn-submit" style="background:var(--income); padding:12px;" id="addCatBtn">➕ အမျိုးအစားသစ်ထည့်မည်</button>
         </div>
@@ -204,6 +220,8 @@
             </div>`).join('');
 
         let net = 0, dIn = 0, dOut = 0;
+        let monthlyData = Array(12).fill(0).map(() => ({ in: 0, out: 0 }));
+        
         const history = document.getElementById('logHistory');
         history.innerHTML = '';
         
@@ -211,6 +229,13 @@
             const isP = r.type === 'plus';
             net += isP ? r.amt : -r.amt;
             dIn += isP ? r.amt : 0; dOut += isP ? 0 : r.amt;
+
+            // Yearly Logic
+            const date = new Date(r.timestamp);
+            const month = date.getMonth();
+            if(isP) monthlyData[month].in += r.amt;
+            else monthlyData[month].out += r.amt;
+
             history.innerHTML += `<div class="log-item" style="border-left-color:${isP?'var(--income)':'var(--expense)'}">
                 <div><b>${r.name}</b><br><small>${r.icon} ${r.catName}</small></div>
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -218,6 +243,18 @@
                     ${isAdmin ? `<button class="del-btn" onclick="window.deleteRec('${r.id}')">✖</button>` : ''}
                 </div></div>`;
         });
+
+        // Render Annual Table
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        document.getElementById('annualBody').innerHTML = monthlyData.map((m, i) => `
+            <tr>
+                <td>${months[i]}</td>
+                <td style="color:var(--income)">${m.in.toLocaleString()}</td>
+                <td style="color:var(--expense)">${m.out.toLocaleString()}</td>
+                <td style="font-weight:bold;">${(m.in - m.out).toLocaleString()}</td>
+            </tr>
+        `).join('');
+
         document.getElementById('totalDisplay').innerText = (openingBal + net).toLocaleString();
         document.getElementById('dayInDisplay').innerText = dIn.toLocaleString();
         document.getElementById('dayOutDisplay').innerText = dOut.toLocaleString();
@@ -293,7 +330,6 @@
 
     document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
 
-    // --- Status ---
     window.addEventListener('online', () => { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; });
     window.addEventListener('offline', () => { document.getElementById('statusIndicator').className="offline"; document.getElementById('statusIndicator').innerText="Offline 🔴"; });
     if(navigator.onLine) { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; }
