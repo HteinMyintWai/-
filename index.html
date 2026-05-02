@@ -24,7 +24,7 @@
         .card { background: var(--white); border-radius: 25px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
         .cat-scroll { overflow-x: auto; white-space: nowrap; margin-bottom: 15px; padding-bottom: 5px; display: flex; gap: 10px; }
-        .cat-item { flex: 0 0 auto; padding: 15px 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; min-width: 80px; background: white; transition: 0.3s; }
+        .cat-item { flex: 0 0 auto; padding: 15px 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; min-width: 80px; background: white; }
         .cat-item.active.plus { background: var(--income); color: white; border-color: var(--income); }
         .cat-item.active.minus { background: var(--expense); color: white; border-color: var(--expense); }
 
@@ -32,14 +32,14 @@
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
         .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
-        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.1rem; padding: 5px; }
+        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.1rem; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
-        .modal-content { background: white; width: 100%; max-width: 450px; padding: 25px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 95%; max-width: 450px; padding: 25px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
         .setting-box { background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #eee; }
         
         .type-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .type-btn { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 12px; text-align: center; cursor: pointer; }
+        .type-btn { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 15px; text-align: center; cursor: pointer; font-weight: bold; }
         .type-btn.active.plus { background: var(--income); color: white; border-color: var(--income); }
         .type-btn.active.minus { background: var(--expense); color: white; border-color: var(--expense); }
     </style>
@@ -92,14 +92,14 @@
         
         <div class="setting-box">
             <h4 style="margin-top:0;">📁 အမျိုးအစားများ စီမံရန်</h4>
-            <div id="catEditList" style="margin-bottom:15px; max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 10px;">
+            <div id="catEditList" style="margin-bottom:15px; border: 1px solid #eee; padding: 10px; border-radius: 15px; max-height: 150px; overflow-y: auto;">
                 </div>
             <div class="type-selector">
-                <div id="typePlus" class="type-btn active plus" onclick="window.toggleNewCatType('plus')">ဝင်ငွေ (+)</div>
-                <div id="typeMinus" class="type-btn minus" onclick="window.toggleNewCatType('minus')">အသုံး (-)</div>
+                <div id="typePlus" class="type-btn active plus" onclick="window.setNewType('plus')">ဝင်ငွေ (+)</div>
+                <div id="typeMinus" class="type-btn minus" onclick="window.setNewType('minus')">အသုံး (-)</div>
             </div>
             <div style="display:flex; gap:5px;">
-                <input type="text" id="newCatIcon" class="main-input" placeholder="Icon (ဥပမာ-🎁)" style="width:30%;">
+                <input type="text" id="newCatIcon" class="main-input" placeholder="🎁" style="width:30%;">
                 <input type="text" id="newCatName" class="main-input" placeholder="အမျိုးအစားအမည်" style="width:70%;">
             </div>
             <button class="btn-submit" style="background:var(--income); padding:12px;" id="addCatBtn">➕ အမျိုးအစားသစ်ထည့်မည်</button>
@@ -117,7 +117,7 @@
 
         <div class="setting-box">
             <h4 style="margin-top:0;">💰 မူလလက်ကျန်ငွေ</h4>
-            <input type="number" id="openingBalInput" class="main-input" placeholder="Opening Balance">
+            <input type="number" id="openingBalInput" class="main-input">
             <button class="btn-submit" style="background:#636e72; padding:12px;" id="saveOpenBtn">သိမ်းမည်</button>
         </div>
 
@@ -142,25 +142,25 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- State ---
+    // --- Variables ---
     let records = [];
+    let isAdmin = false;
+    let selectedCatId = 1;
+    let openingBal = 0;
+    let newCatType = 'plus';
+    let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
     let categories = [
         { id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" },
         { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }
     ];
-    let isAdmin = false;
-    let selectedCatId = 1;
-    let openingBal = 0;
-    let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
-    let newCatType = 'plus';
 
-    // --- Firebase Logic ---
+    // --- Firebase Sync ---
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
         records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderUI();
     });
 
-    async function loadSettings() {
+    async function loadCloudSettings() {
         const docRef = doc(db, "settings", "main_config");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -171,35 +171,31 @@
         }
         renderUI();
     }
-    loadSettings();
+    loadCloudSettings();
 
-    async function saveAllSettings() {
+    async function saveSettings() {
         await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal, categories }, { merge: true });
     }
 
-    // --- Window Scope Functions ---
+    // --- App Logic ---
     window.setCat = (id) => { selectedCatId = id; renderUI(); };
-    
-    window.toggleNewCatType = (type) => {
+    window.setNewType = (type) => {
         newCatType = type;
-        document.getElementById('typePlus').className = `type-btn ${type === 'plus' ? 'active plus' : ''}`;
-        document.getElementById('typeMinus').className = `type-btn ${type === 'minus' ? 'active minus' : ''}`;
+        document.getElementById('typePlus').className = `type-btn ${type==='plus'?'active plus':''}`;
+        document.getElementById('typeMinus').className = `type-btn ${type==='minus'?'active minus':''}`;
     };
 
-    window.removeCat = async (catId) => {
+    window.deleteRec = async (id) => { if(confirm("ဤစာရင်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
+    
+    window.removeCat = async (id) => {
         if(confirm("ဤအမျိုးအစားကို ဖျက်မှာလား?")) {
-            categories = categories.filter(c => c.id !== catId);
-            await saveAllSettings();
+            categories = categories.filter(c => c.id !== id);
+            await saveSettings();
             renderUI();
             renderEditCats();
         }
     };
 
-    window.deleteRec = async (id) => {
-        if(confirm("ဤမှတ်တမ်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id));
-    };
-
-    // --- UI Rendering ---
     function renderUI() {
         const catRow = document.getElementById('catRow');
         catRow.innerHTML = categories.map(c => `
@@ -228,15 +224,14 @@
     }
 
     function renderEditCats() {
-        const list = document.getElementById('catEditList');
-        list.innerHTML = categories.map(c => `
+        document.getElementById('catEditList').innerHTML = categories.map(c => `
             <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; align-items:center;">
                 <span>${c.icon} ${c.name} <small>(${c.type})</small></span>
-                <button style="border:none; background:none; color:red; cursor:pointer;" onclick="window.removeCat(${c.id})">✖</button>
+                <span style="color:red; cursor:pointer; font-weight:bold; padding:5px;" onclick="window.removeCat(${c.id})">✖</span>
             </div>`).join('');
     }
 
-    // --- Action Listeners ---
+    // --- Buttons ---
     document.getElementById('loginBtn').onclick = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
@@ -257,7 +252,6 @@
         const amt = parseFloat(document.getElementById('itemAmt').value);
         if(!amt) return alert("ပမာဏ ထည့်ပါ");
         const c = categories.find(x => x.id === selectedCatId);
-        if(!c) return alert("အမျိုးအစား ရွေးပါ");
         await addDoc(collection(db, "records"), {
             name: document.getElementById('itemName').value || "မှတ်ချက်မရှိ",
             amt: amt, catName: c.name, icon: c.icon, type: c.type, timestamp: Date.now()
@@ -267,10 +261,9 @@
 
     document.getElementById('addCatBtn').onclick = async () => {
         const name = document.getElementById('newCatName').value;
-        const icon = document.getElementById('newCatIcon').value || "📁";
         if(!name) return alert("အမည်ထည့်ပါ");
-        categories.push({ id: Date.now(), icon, name, type: newCatType });
-        await saveAllSettings();
+        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "🎁", name, type: newCatType });
+        await saveSettings();
         document.getElementById('newCatName').value = '';
         renderEditCats(); renderUI();
     };
@@ -290,15 +283,15 @@
         loginConfigs.admin.p = document.getElementById('newAdminPass').value;
         loginConfigs.staff.u = document.getElementById('newStaffUser').value;
         loginConfigs.staff.p = document.getElementById('newStaffPass').value;
-        await saveAllSettings(); alert("အကောင့်များ သိမ်းဆည်းပြီးပါပြီ!");
+        await saveSettings(); alert("Accounts Saved!");
     };
 
     document.getElementById('saveOpenBtn').onclick = async () => {
         openingBal = parseFloat(document.getElementById('openingBalInput').value) || 0;
-        await saveAllSettings(); renderUI(); alert("မူလလက်ကျန် သိမ်းဆည်းပြီးပါပြီ!");
+        await saveSettings(); renderUI(); alert("Balance Saved!");
     };
 
-    document.getElementById('closeSettings').onclick = () => { document.getElementById('settingsModal').style.display = 'none'; };
+    document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
 
     // --- Status ---
     window.addEventListener('online', () => { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; });
