@@ -24,7 +24,7 @@
         .card { background: var(--white); border-radius: 25px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
         .cat-scroll { overflow-x: auto; white-space: nowrap; margin-bottom: 15px; padding-bottom: 5px; display: flex; gap: 10px; }
-        .cat-item { flex: 0 0 auto; padding: 15px 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; min-width: 80px; background: white; }
+        .cat-item { flex: 0 0 auto; padding: 15px 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; min-width: 80px; background: white; transition: 0.3s; }
         .cat-item.active.plus { background: var(--income); color: white; border-color: var(--income); }
         .cat-item.active.minus { background: var(--expense); color: white; border-color: var(--expense); }
 
@@ -32,14 +32,16 @@
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
         .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
-        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.1rem; }
+        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.1rem; padding: 5px; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 95%; max-width: 450px; padding: 25px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
-        .setting-box { background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #eee; text-align: left; }
-        .type-opt { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd; text-align: center; cursor: pointer; font-size: 0.8rem; }
-        .type-opt.selected.plus { background: var(--income); color: white; }
-        .type-opt.selected.minus { background: var(--expense); color: white; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
+        .modal-content { background: white; width: 100%; max-width: 450px; padding: 25px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
+        .setting-box { background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #eee; }
+        
+        .type-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .type-btn { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 12px; text-align: center; cursor: pointer; }
+        .type-btn.active.plus { background: var(--income); color: white; border-color: var(--income); }
+        .type-btn.active.minus { background: var(--expense); color: white; border-color: var(--expense); }
     </style>
 </head>
 <body>
@@ -60,9 +62,7 @@
     <div class="header-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div id="roleDisplay" style="font-size:0.8rem; opacity:0.8;">Role: Loading...</div>
-            <div style="display:flex; gap:10px;">
-                <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">⚙️</button>
-            </div>
+            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.4rem; cursor:pointer;">⚙️</button>
         </div>
         <div style="margin-top:10px;">စုစုပေါင်းလက်ကျန်ငွေ</div>
         <div class="bal-val"><span id="totalDisplay">0</span></div>
@@ -91,33 +91,34 @@
         <h3 style="margin-top:0;">⚙️ Settings</h3>
         
         <div class="setting-box">
-            <h4>📁 အမျိုးအစားများ စီမံရန်</h4>
-            <div id="catEditList" style="margin-bottom:15px; border-bottom: 1px solid #ddd; padding-bottom: 10px;"></div>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <div id="typePlus" class="type-opt selected plus" onclick="window.setNewCatType('plus')">ဝင်ငွေ (+)</div>
-                <div id="typeMinus" class="type-opt minus" onclick="window.setNewCatType('minus')">အသုံး (-)</div>
+            <h4 style="margin-top:0;">📁 အမျိုးအစားများ စီမံရန်</h4>
+            <div id="catEditList" style="margin-bottom:15px; max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 10px;">
+                </div>
+            <div class="type-selector">
+                <div id="typePlus" class="type-btn active plus" onclick="window.toggleNewCatType('plus')">ဝင်ငွေ (+)</div>
+                <div id="typeMinus" class="type-btn minus" onclick="window.toggleNewCatType('minus')">အသုံး (-)</div>
             </div>
             <div style="display:flex; gap:5px;">
-                <input type="text" id="newCatIcon" class="main-input" placeholder="🎁" style="width:25%; margin-bottom:0;">
-                <input type="text" id="newCatName" class="main-input" placeholder="အမည်" style="width:75%; margin-bottom:0;">
+                <input type="text" id="newCatIcon" class="main-input" placeholder="Icon (ဥပမာ-🎁)" style="width:30%;">
+                <input type="text" id="newCatName" class="main-input" placeholder="အမျိုးအစားအမည်" style="width:70%;">
             </div>
-            <button class="btn-submit" style="background:var(--income); padding:10px; margin-top:10px;" id="addCatBtn">အမျိုးအစားသစ်ထည့်မည်</button>
+            <button class="btn-submit" style="background:var(--income); padding:12px;" id="addCatBtn">➕ အမျိုးအစားသစ်ထည့်မည်</button>
         </div>
 
         <div class="setting-box">
-            <h4>🔐 User Accounts</h4>
+            <h4 style="margin-top:0;">🔐 User Accounts</h4>
             <input type="text" id="newAdminUser" class="main-input" placeholder="Admin User">
             <input type="text" id="newAdminPass" class="main-input" placeholder="Admin Pass">
             <hr>
             <input type="text" id="newStaffUser" class="main-input" placeholder="Staff User">
             <input type="text" id="newStaffPass" class="main-input" placeholder="Staff Pass">
-            <button class="btn-submit" style="padding:10px;" id="saveAccBtn">အကောင့်များသိမ်းမည်</button>
+            <button class="btn-submit" style="padding:12px;" id="saveAccBtn">အကောင့်များသိမ်းမည်</button>
         </div>
 
         <div class="setting-box">
-            <h4>💰 မူလလက်ကျန်ငွေ</h4>
-            <input type="number" id="openingBalInput" class="main-input">
-            <button class="btn-submit" style="background:#636e72; padding:10px;" id="saveOpenBtn">သိမ်းမည်</button>
+            <h4 style="margin-top:0;">💰 မူလလက်ကျန်ငွေ</h4>
+            <input type="number" id="openingBalInput" class="main-input" placeholder="Opening Balance">
+            <button class="btn-submit" style="background:#636e72; padding:12px;" id="saveOpenBtn">သိမ်းမည်</button>
         </div>
 
         <button class="btn-submit" style="background:#ccc; color:#333;" id="closeSettings">ပိတ်မည်</button>
@@ -153,13 +154,13 @@
     let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
     let newCatType = 'plus';
 
-    // --- Sync Firebase ---
+    // --- Firebase Logic ---
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
         records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderUI();
     });
 
-    async function loadCloudSettings() {
+    async function loadSettings() {
         const docRef = doc(db, "settings", "main_config");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -170,29 +171,35 @@
         }
         renderUI();
     }
-    loadCloudSettings();
+    loadSettings();
 
-    // --- Window Functions ---
+    async function saveAllSettings() {
+        await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal, categories }, { merge: true });
+    }
+
+    // --- Window Scope Functions ---
     window.setCat = (id) => { selectedCatId = id; renderUI(); };
-    window.setNewCatType = (t) => { 
-        newCatType = t; 
-        document.getElementById('typePlus').classList.toggle('selected', t === 'plus');
-        document.getElementById('typeMinus').classList.toggle('selected', t === 'minus');
+    
+    window.toggleNewCatType = (type) => {
+        newCatType = type;
+        document.getElementById('typePlus').className = `type-btn ${type === 'plus' ? 'active plus' : ''}`;
+        document.getElementById('typeMinus').className = `type-btn ${type === 'minus' ? 'active minus' : ''}`;
     };
-    window.deleteRec = async (id) => { if(confirm("ဤစာရင်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
-    window.removeCat = async (id) => {
+
+    window.removeCat = async (catId) => {
         if(confirm("ဤအမျိုးအစားကို ဖျက်မှာလား?")) {
-            categories = categories.filter(c => c.id !== id);
-            await saveSettingsToCloud();
+            categories = categories.filter(c => c.id !== catId);
+            await saveAllSettings();
             renderUI();
             renderEditCats();
         }
     };
 
-    async function saveSettingsToCloud() {
-        await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal, categories }, { merge: true });
-    }
+    window.deleteRec = async (id) => {
+        if(confirm("ဤမှတ်တမ်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id));
+    };
 
+    // --- UI Rendering ---
     function renderUI() {
         const catRow = document.getElementById('catRow');
         catRow.innerHTML = categories.map(c => `
@@ -221,14 +228,15 @@
     }
 
     function renderEditCats() {
-        document.getElementById('catEditList').innerHTML = categories.map(c => `
-            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
-                <span>${c.icon} ${c.name} (${c.type === 'plus' ? 'ဝင်ငွေ' : 'အသုံး'})</span>
-                <span style="color:red; cursor:pointer;" onclick="window.removeCat(${c.id})">✖</span>
+        const list = document.getElementById('catEditList');
+        list.innerHTML = categories.map(c => `
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; align-items:center;">
+                <span>${c.icon} ${c.name} <small>(${c.type})</small></span>
+                <button style="border:none; background:none; color:red; cursor:pointer;" onclick="window.removeCat(${c.id})">✖</button>
             </div>`).join('');
     }
 
-    // --- Buttons ---
+    // --- Action Listeners ---
     document.getElementById('loginBtn').onclick = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
@@ -259,9 +267,10 @@
 
     document.getElementById('addCatBtn').onclick = async () => {
         const name = document.getElementById('newCatName').value;
+        const icon = document.getElementById('newCatIcon').value || "📁";
         if(!name) return alert("အမည်ထည့်ပါ");
-        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "🎁", name, type: newCatType });
-        await saveSettingsToCloud();
+        categories.push({ id: Date.now(), icon, name, type: newCatType });
+        await saveAllSettings();
         document.getElementById('newCatName').value = '';
         renderEditCats(); renderUI();
     };
@@ -281,16 +290,17 @@
         loginConfigs.admin.p = document.getElementById('newAdminPass').value;
         loginConfigs.staff.u = document.getElementById('newStaffUser').value;
         loginConfigs.staff.p = document.getElementById('newStaffPass').value;
-        await saveSettingsToCloud(); alert("Saved!");
+        await saveAllSettings(); alert("အကောင့်များ သိမ်းဆည်းပြီးပါပြီ!");
     };
 
     document.getElementById('saveOpenBtn').onclick = async () => {
         openingBal = parseFloat(document.getElementById('openingBalInput').value) || 0;
-        await saveSettingsToCloud(); renderUI(); alert("Saved!");
+        await saveAllSettings(); renderUI(); alert("မူလလက်ကျန် သိမ်းဆည်းပြီးပါပြီ!");
     };
 
-    document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
+    document.getElementById('closeSettings').onclick = () => { document.getElementById('settingsModal').style.display = 'none'; };
 
+    // --- Status ---
     window.addEventListener('online', () => { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; });
     window.addEventListener('offline', () => { document.getElementById('statusIndicator').className="offline"; document.getElementById('statusIndicator').innerText="Offline 🔴"; });
     if(navigator.onLine) { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; }
