@@ -19,31 +19,24 @@
 
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 10000; }
         .login-card { background: white; padding: 35px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
-        .login-card input { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 15px; box-sizing: border-box; }
+        .login-card input { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 15px; box-sizing: border-box; outline: none; }
+        
         .app-container { max-width: 500px; margin: auto; padding: 15px; display: none; }
         .header-card { background: linear-gradient(135deg, #341f97, #4834d4); color: white; padding: 30px 20px; border-radius: 30px; text-align: center; margin-bottom: 10px; position: relative; }
         .bal-val { font-size: 3rem; font-weight: 800; margin: 10px 0; }
         .daily-summary { background: var(--dark); color: white; display: grid; grid-template-columns: 1fr 1fr; padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
+        
         .card { background: var(--white); border-radius: 25px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .cat-scroll { overflow-x: auto; white-space: nowrap; margin-bottom: 15px; padding-bottom: 5px; display: flex; gap: 10px; }
         .cat-item { flex: 0 0 auto; padding: 15px 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; min-width: 80px; transition: 0.3s; background: white; }
         .cat-item.active.plus { background: var(--income); color: white; border-color: var(--income); }
         .cat-item.active.minus { background: var(--expense); color: white; border-color: var(--expense); }
+        
         .main-input { width: 100%; padding: 16px; border: 1.5px solid #eee; border-radius: 15px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
-        .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
-        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; padding: 5px; }
-        .table-container { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background: #fff; }
-        th { background: var(--dark); color: white; padding: 10px; text-align: left; border: 1px solid #444; }
-        td { padding: 10px; border: 1px solid #eee; vertical-align: top; }
-        .detail-box { font-size: 0.7rem; background: #f1f1f1; padding: 4px 6px; border-radius: 6px; margin-bottom: 3px; display: block; border-left: 3px solid #ccc; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 95%; max-width: 450px; padding: 25px; border-radius: 30px; max-height: 90vh; overflow-y: auto; }
-        .setting-box { background: #f8f9fa; padding: 20px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #eee; }
-        .type-opt { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd; text-align: center; cursor: pointer; font-size: 0.8rem; }
-        .type-opt.selected.plus { background: var(--income); color: white; }
-        .type-opt.selected.minus { background: var(--expense); color: white; }
+        
+        .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; padding: 5px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -65,13 +58,11 @@
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div id="roleDisplay" style="font-size:0.8rem; opacity:0.8;">Role: Loading...</div>
             <div style="display:flex; gap:10px;">
-                <button id="yearlyBtn" style="background:rgba(255,255,255,0.2); border:none; color:white; border-radius:10px; padding:5px 12px; font-size:0.75rem; cursor:pointer;">📊 နှစ်ချုပ်</button>
                 <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">⚙️</button>
             </div>
         </div>
         <div style="margin-top:10px;">စုစုပေါင်းလက်ကျန်ငွေ</div>
         <div class="bal-val"><span id="totalDisplay">0</span> ကျပ်</div>
-        <div style="background:rgba(255,255,255,0.1); display:inline-block; padding:5px 15px; border-radius:50px; font-size:0.9rem;">02/05/2026 ⌄</div>
     </div>
 
     <div class="daily-summary">
@@ -81,20 +72,23 @@
 
     <div class="card">
         <div class="cat-scroll" id="catRow"></div>
-        <input type="text" id="itemName" class="main-input" placeholder="ပစ္စည်း/အကြောင်းအရာ">
+        <input type="text" id="itemName" class="main-input" placeholder="အကြောင်းအရာ">
         <input type="number" id="itemAmt" class="main-input" placeholder="ပမာဏ (ကျပ်)">
         <button class="btn-submit" id="saveBtn">📥 စာရင်းသွင်းမည်</button>
     </div>
 
-    <h3 style="margin:20px 5px;">🕒 မှတ်တမ်းများ (Cloud)</h3>
+    <h3 style="margin:20px 5px;">🕒 Cloud မှတ်တမ်းများ</h3>
     <div id="logHistory"></div>
     <button class="btn-submit" style="background:var(--dark); margin-top:20px;" onclick="location.reload()">🚪 Logout ထွက်မည်</button>
 </div>
 
 <script type="module">
+    // Firebase SDKs များအား Version 10.8.0 ဖြင့် ချိတ်ဆက်ခြင်း
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, setDoc, getDoc, enableNetwork, disableNetwork } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // သင်၏ Firebase Configuration (ပုံပါအတိုင်း အသစ်လဲလှယ်ထားပါသည်)
     const firebaseConfig = {
         apiKey: "AIzaSyAo0NxlLIUtWzIJJx8Ein5Ftidacw0W9Lw",
         authDomain: "myrecordsystem-af249.firebaseapp.com",
@@ -105,16 +99,13 @@
         measurementId: "G-DT9N6G4MQS"
     };
 
+    // Firebase ကို စတင်အသုံးပြုခြင်း
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
     // --- Connection Monitoring ---
     const statusDiv = document.getElementById('statusIndicator');
-    
-    // Firebase နဲ့ ချိတ်ဆက်မှု ရှိ၊ မရှိ စစ်ဆေးခြင်း
-    const connectedRef = collection(db, ".info/connected"); // Firestore connection monitor
-    
-    // ပိုသေချာအောင် Window online/offline ကိုသုံးပြီး Status ပြောင်းပေးခြင်း
     function updateStatus() {
         if (navigator.onLine) {
             statusDiv.innerText = "Cloud Online 🟢";
@@ -124,39 +115,31 @@
             statusDiv.className = "offline";
         }
     }
-    
     window.addEventListener('online', updateStatus);
     window.addEventListener('offline', updateStatus);
-    updateStatus(); // ဖွင့်ဖွင့်ချင်း စစ်ဆေးရန်
+    updateStatus();
 
-    // --- State & Functions ---
+    // --- App Logic ---
     let records = [];
-    let categories = JSON.parse(localStorage.getItem('pro_cats_v11')) || [
+    let isAdmin = false;
+    let openingBal = 0;
+    const categories = [
         { id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" },
         { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }
     ];
-    let openingBal = 0;
-    let isAdmin = false;
-    let selectedCatId = categories[0].id;
+    let selectedCatId = 1;
 
-    // Firebase Data Sync
+    // Real-time Data Sync
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
         records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderUI();
     });
 
-    async function fetchSettings() {
-        const docRef = doc(db, "settings", "main");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) { openingBal = docSnap.data().openingBal || 0; renderUI(); }
-    }
-    fetchSettings();
-
     window.handleLogin = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
-        if(u === "admin" && p === "1234") { isAdmin = true; startApp("ပိုင်ရှင် (Admin)"); }
-        else if(u === "staff" && p === "5678") { isAdmin = false; startApp("ဝန်ထမ်း (Staff)"); }
+        if(u === "admin" && p === "1234") { isAdmin = true; startApp("Admin"); }
+        else if(u === "staff" && p === "5678") { isAdmin = false; startApp("Staff"); }
         else { document.getElementById('loginError').style.display = 'block'; }
     };
 
@@ -164,7 +147,6 @@
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         document.getElementById('roleDisplay').innerText = "Role: " + role;
-        if(!isAdmin) document.getElementById('settingBtn').style.display = 'none';
         renderUI();
     }
 
@@ -207,7 +189,8 @@
                 name: document.getElementById('itemName').value || "မှတ်ချက်မရှိ",
                 amt: amt, catName: c.name, icon: c.icon, type: c.type, timestamp: Date.now()
             });
-            document.getElementById('itemAmt').value = ''; document.getElementById('itemName').value = '';
+            document.getElementById('itemAmt').value = ''; 
+            document.getElementById('itemName').value = '';
         } catch (e) { alert("Error: " + e.message); }
     };
 
