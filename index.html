@@ -20,9 +20,10 @@
         .header-card { background: linear-gradient(135deg, #341f97, #4834d4); color: white; padding: 30px 20px; border-radius: 30px; text-align: center; margin-bottom: 10px; position: relative; }
         .bal-val { font-size: 2.8rem; font-weight: 800; margin: 10px 0; }
         
-        .daily-summary { background: var(--dark); color: white; display: grid; grid-template-columns: 1fr 1fr; padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
+        .daily-summary { background: var(--dark); color: white; display: grid; grid-template-columns: 1fr 1fr; padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 15px; }
+        .btn-report { background: #6c5ce7; color: white; padding: 12px; border: none; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
+
         .card { background: var(--white); border-radius: 25px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        
         .cat-scroll { overflow-x: auto; white-space: nowrap; margin-bottom: 15px; padding-bottom: 5px; display: flex; gap: 10px; }
         .cat-item { flex: 0 0 auto; padding: 15px 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; min-width: 80px; background: white; }
         .cat-item.active.plus { background: var(--income); color: white; border-color: var(--income); }
@@ -31,9 +32,8 @@
         .main-input { width: 100%; padding: 16px; border: 1.5px solid #eee; border-radius: 15px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
-        /* Annual Table Styling */
-        .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-        .report-table th, .report-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .report-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .report-table th, .report-table td { padding: 12px 8px; border-bottom: 1px solid #eee; text-align: left; }
         .report-table th { background: #f8f9fa; color: #666; }
 
         .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
@@ -67,7 +67,7 @@
     <div class="header-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div id="roleDisplay" style="font-size:0.8rem; opacity:0.8;">Role: Loading...</div>
-            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.4rem; cursor:pointer;">⚙️</button>
+            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.4rem;">⚙️</button>
         </div>
         <div style="margin-top:10px;">စုစုပေါင်းလက်ကျန်ငွေ</div>
         <div class="bal-val"><span id="totalDisplay">0</span></div>
@@ -79,17 +79,7 @@
         <div>အသုံး: <span id="dayOutDisplay" style="color:var(--expense)">0</span></div>
     </div>
 
-    <div class="card">
-        <h4 style="margin-top:0; color:var(--primary);">📊 ၂၀၂၆ နှစ်ချုပ်စာရင်း</h4>
-        <div style="overflow-x:auto;">
-            <table class="report-table">
-                <thead>
-                    <tr><th>လ</th><th>ဝင်ငွေ</th><th>အသုံး</th><th>အမြတ်</th></tr>
-                </thead>
-                <tbody id="annualBody"></tbody>
-            </table>
-        </div>
-    </div>
+    <button class="btn-report" id="annualReportBtn">📊 နှစ်ချုပ်မှတ်တမ်းကြည့်ရန်</button>
 
     <div class="card">
         <div class="cat-scroll" id="catRow"></div>
@@ -101,6 +91,17 @@
     <h3 style="margin:20px 5px;">🕒 Cloud မှတ်တမ်းများ</h3>
     <div id="logHistory"></div>
     <button class="btn-submit" style="background:var(--dark); margin-top:20px;" onclick="location.reload()">🚪 Logout ထွက်မည်</button>
+</div>
+
+<div id="annualModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color:var(--primary);">📈 ၂၀၂၆ နှစ်ချုပ်စာရင်း</h3>
+        <table class="report-table">
+            <thead><tr><th>လ</th><th>ဝင်ငွေ</th><th>အသုံး</th><th>အမြတ်</th></tr></thead>
+            <tbody id="annualBody"></tbody>
+        </table>
+        <button class="btn-submit" style="background:#ccc; color:#333; margin-top:20px;" onclick="document.getElementById('annualModal').style.display='none'">ပြန်ပိတ်မည်</button>
+    </div>
 </div>
 
 <div id="settingsModal" class="modal">
@@ -119,16 +120,6 @@
                 <input type="text" id="newCatName" class="main-input" placeholder="အမည်" style="width:70%;">
             </div>
             <button class="btn-submit" style="background:var(--income); padding:12px;" id="addCatBtn">➕ အမျိုးအစားသစ်ထည့်မည်</button>
-        </div>
-
-        <div class="setting-box">
-            <h4 style="margin-top:0;">🔐 User Accounts</h4>
-            <input type="text" id="newAdminUser" class="main-input" placeholder="Admin User">
-            <input type="text" id="newAdminPass" class="main-input" placeholder="Admin Pass">
-            <hr>
-            <input type="text" id="newStaffUser" class="main-input" placeholder="Staff User">
-            <input type="text" id="newStaffPass" class="main-input" placeholder="Staff Pass">
-            <button class="btn-submit" style="padding:12px;" id="saveAccBtn">အကောင့်များသိမ်းမည်</button>
         </div>
 
         <div class="setting-box">
@@ -158,17 +149,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- Variables ---
     let records = [];
     let isAdmin = false;
     let selectedCatId = 1;
     let openingBal = 0;
     let newCatType = 'plus';
     let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
-    let categories = [
-        { id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" },
-        { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }
-    ];
+    let categories = [{ id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" }, { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }];
 
     // --- Firebase Sync ---
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
@@ -176,40 +163,28 @@
         renderUI();
     });
 
-    async function loadCloudSettings() {
-        const docRef = doc(db, "settings", "main_config");
-        const docSnap = await getDoc(docRef);
+    async function loadSettings() {
+        const docSnap = await getDoc(doc(db, "settings", "main_config"));
         if (docSnap.exists()) {
             const data = docSnap.data();
             openingBal = data.openingBal || 0;
-            loginConfigs = data.loginConfigs || loginConfigs;
             if(data.categories) categories = data.categories;
+            if(data.loginConfigs) loginConfigs = data.loginConfigs;
         }
         renderUI();
     }
-    loadCloudSettings();
+    loadSettings();
 
-    async function saveSettings() {
-        await setDoc(doc(db, "settings", "main_config"), { loginConfigs, openingBal, categories }, { merge: true });
+    async function saveCloudSettings() {
+        await setDoc(doc(db, "settings", "main_config"), { openingBal, categories, loginConfigs }, { merge: true });
     }
 
-    // --- App Logic ---
+    // --- UI Logic ---
     window.setCat = (id) => { selectedCatId = id; renderUI(); };
     window.setNewType = (type) => {
         newCatType = type;
         document.getElementById('typePlus').className = `type-btn ${type==='plus'?'active plus':''}`;
         document.getElementById('typeMinus').className = `type-btn ${type==='minus'?'active minus':''}`;
-    };
-
-    window.deleteRec = async (id) => { if(confirm("ဤစာရင်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
-    
-    window.removeCat = async (id) => {
-        if(confirm("ဤအမျိုးအစားကို ဖျက်မှာလား?")) {
-            categories = categories.filter(c => c.id !== id);
-            await saveSettings();
-            renderUI();
-            renderEditCats();
-        }
     };
 
     function renderUI() {
@@ -220,8 +195,6 @@
             </div>`).join('');
 
         let net = 0, dIn = 0, dOut = 0;
-        let monthlyData = Array(12).fill(0).map(() => ({ in: 0, out: 0 }));
-        
         const history = document.getElementById('logHistory');
         history.innerHTML = '';
         
@@ -229,13 +202,6 @@
             const isP = r.type === 'plus';
             net += isP ? r.amt : -r.amt;
             dIn += isP ? r.amt : 0; dOut += isP ? 0 : r.amt;
-
-            // Yearly Logic
-            const date = new Date(r.timestamp);
-            const month = date.getMonth();
-            if(isP) monthlyData[month].in += r.amt;
-            else monthlyData[month].out += r.amt;
-
             history.innerHTML += `<div class="log-item" style="border-left-color:${isP?'var(--income)':'var(--expense)'}">
                 <div><b>${r.name}</b><br><small>${r.icon} ${r.catName}</small></div>
                 <div style="display:flex; align-items:center; gap:10px;">
@@ -243,32 +209,12 @@
                     ${isAdmin ? `<button class="del-btn" onclick="window.deleteRec('${r.id}')">✖</button>` : ''}
                 </div></div>`;
         });
-
-        // Render Annual Table
-        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        document.getElementById('annualBody').innerHTML = monthlyData.map((m, i) => `
-            <tr>
-                <td>${months[i]}</td>
-                <td style="color:var(--income)">${m.in.toLocaleString()}</td>
-                <td style="color:var(--expense)">${m.out.toLocaleString()}</td>
-                <td style="font-weight:bold;">${(m.in - m.out).toLocaleString()}</td>
-            </tr>
-        `).join('');
-
         document.getElementById('totalDisplay').innerText = (openingBal + net).toLocaleString();
         document.getElementById('dayInDisplay').innerText = dIn.toLocaleString();
         document.getElementById('dayOutDisplay').innerText = dOut.toLocaleString();
     }
 
-    function renderEditCats() {
-        document.getElementById('catEditList').innerHTML = categories.map(c => `
-            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; align-items:center;">
-                <span>${c.icon} ${c.name} <small>(${c.type})</small></span>
-                <span style="color:red; cursor:pointer; font-weight:bold; padding:5px;" onclick="window.removeCat(${c.id})">✖</span>
-            </div>`).join('');
-    }
-
-    // --- Buttons ---
+    // --- Actions ---
     document.getElementById('loginBtn').onclick = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
@@ -287,7 +233,7 @@
 
     document.getElementById('saveBtn').onclick = async () => {
         const amt = parseFloat(document.getElementById('itemAmt').value);
-        if(!amt) return alert("ပမာဏ ထည့်ပါ");
+        if(!amt) return alert("ပမာဏထည့်ပါ");
         const c = categories.find(x => x.id === selectedCatId);
         await addDoc(collection(db, "records"), {
             name: document.getElementById('itemName').value || "မှတ်ချက်မရှိ",
@@ -296,38 +242,56 @@
         document.getElementById('itemAmt').value = ''; document.getElementById('itemName').value = '';
     };
 
-    document.getElementById('addCatBtn').onclick = async () => {
-        const name = document.getElementById('newCatName').value;
-        if(!name) return alert("အမည်ထည့်ပါ");
-        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "🎁", name, type: newCatType });
-        await saveSettings();
-        document.getElementById('newCatName').value = '';
-        renderEditCats(); renderUI();
+    document.getElementById('annualReportBtn').onclick = () => {
+        let mData = Array(12).fill(0).map(() => ({ in: 0, out: 0 }));
+        records.forEach(r => {
+            const m = new Date(r.timestamp).getMonth();
+            if(r.type === 'plus') mData[m].in += r.amt; else mData[m].out += r.amt;
+        });
+        const mNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        document.getElementById('annualBody').innerHTML = mData.map((m, i) => `
+            <tr><td>${mNames[i]}</td><td style="color:var(--income)">${m.in.toLocaleString()}</td>
+            <td style="color:var(--expense)">${m.out.toLocaleString()}</td><td><b>${(m.in-m.out).toLocaleString()}</b></td></tr>
+        `).join('');
+        document.getElementById('annualModal').style.display = 'flex';
     };
 
+    // --- Settings Actions ---
     document.getElementById('settingBtn').onclick = () => {
         document.getElementById('openingBalInput').value = openingBal;
-        document.getElementById('newAdminUser').value = loginConfigs.admin.u;
-        document.getElementById('newAdminPass').value = loginConfigs.admin.p;
-        document.getElementById('newStaffUser').value = loginConfigs.staff.u;
-        document.getElementById('newStaffPass').value = loginConfigs.staff.p;
         renderEditCats();
         document.getElementById('settingsModal').style.display = 'flex';
     };
 
-    document.getElementById('saveAccBtn').onclick = async () => {
-        loginConfigs.admin.u = document.getElementById('newAdminUser').value;
-        loginConfigs.admin.p = document.getElementById('newAdminPass').value;
-        loginConfigs.staff.u = document.getElementById('newStaffUser').value;
-        loginConfigs.staff.p = document.getElementById('newStaffPass').value;
-        await saveSettings(); alert("Accounts Saved!");
+    function renderEditCats() {
+        document.getElementById('catEditList').innerHTML = categories.map(c => `
+            <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
+                <span>${c.icon} ${c.name} (${c.type})</span>
+                <span style="color:red; cursor:pointer;" onclick="window.removeCat(${c.id})">✖</span>
+            </div>`).join('');
+    }
+
+    window.removeCat = async (id) => {
+        if(confirm("ဖျက်မှာလား?")) {
+            categories = categories.filter(c => c.id !== id);
+            await saveCloudSettings(); renderEditCats(); renderUI();
+        }
+    };
+
+    document.getElementById('addCatBtn').onclick = async () => {
+        const name = document.getElementById('newCatName').value;
+        if(!name) return alert("အမည်ထည့်ပါ");
+        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "🎁", name, type: newCatType });
+        await saveCloudSettings(); renderEditCats(); renderUI();
+        document.getElementById('newCatName').value = '';
     };
 
     document.getElementById('saveOpenBtn').onclick = async () => {
         openingBal = parseFloat(document.getElementById('openingBalInput').value) || 0;
-        await saveSettings(); renderUI(); alert("Balance Saved!");
+        await saveCloudSettings(); renderUI(); alert("သိမ်းဆည်းပြီးပါပြီ");
     };
 
+    window.deleteRec = async (id) => { if(confirm("ဤစာရင်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
     document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
 
     window.addEventListener('online', () => { document.getElementById('statusIndicator').className="online"; document.getElementById('statusIndicator').innerText="Online 🟢"; });
