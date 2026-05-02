@@ -3,83 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Business Wallet 2026 - Premium Edition</title>
+    <title>Smart Business Wallet 2026 - Ultimate Edition</title>
     <style>
-        :root { --primary: #4834d4; --income: #00b894; --expense: #eb4d4b; --dark: #2d3436; --white: #ffffff; --bg: #f0f2f5; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        :root { --primary: #4834d4; --income: #00b894; --expense: #eb4d4b; --dark: #2d3436; --white: #ffffff; --bg: #0f172a; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin: 0; padding: 0; color: white; overflow-x: hidden; }
         
         /* Status Bar */
-        #statusIndicator { position: fixed; top: 15px; right: 15px; padding: 6px 14px; border-radius: 25px; font-size: 0.7rem; font-weight: bold; z-index: 10001; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .online { background: #e3fdf5; color: #00b894; border: 1px solid #00b894; }
-        .offline { background: #ffeaa7; color: #d63031; border: 1px solid #d63031; }
+        #statusIndicator { position: fixed; top: 15px; right: 15px; padding: 6px 14px; border-radius: 25px; font-size: 0.7rem; font-weight: bold; z-index: 10001; }
+        .online { background: #00b894; color: white; }
+        .offline { background: #d63031; color: white; }
 
-        /* Beautiful Login Screen */
-        #loginOverlay { 
-            position: fixed; inset: 0; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            display: flex; justify-content: center; align-items: center; z-index: 10000; 
+        /* --- Animated Gradient Border Wrapper --- */
+        .gradient-border {
+            position: relative; padding: 3px;
+            background: linear-gradient(90deg, #00dbde, #fc00ff, #00dbde);
+            background-size: 200% 200%;
+            animation: borderRotate 3s linear infinite;
+            border-radius: 30px;
         }
-        .login-card { 
-            background: rgba(255, 255, 255, 0.95); 
-            padding: 40px 30px; 
-            border-radius: 35px; 
-            width: 88%; 
-            max-width: 380px; 
-            text-align: center; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            animation: slideUp 0.6s ease-out;
-        }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .login-card h2 { color: #341f97; margin-bottom: 25px; font-weight: 800; font-size: 1.6rem; }
-        .login-card input { 
-            width: 100%; padding: 16px; margin-bottom: 15px; 
-            border: 2px solid #f1f2f6; border-radius: 18px; 
-            box-sizing: border-box; outline: none; transition: 0.3s;
-            font-size: 1rem; background: #f9f9f9;
-        }
-        .login-card input:focus { border-color: var(--primary); background: white; box-shadow: 0 5px 15px rgba(72, 52, 212, 0.1); }
-        .login-card .btn-login { 
-            width: 100%; padding: 18px; border: none; border-radius: 18px; 
-            background: var(--primary); color: white; font-weight: bold; 
-            font-size: 1.1rem; cursor: pointer; transition: 0.3s;
-            margin-top: 10px;
-        }
-        .login-card .btn-login:active { transform: scale(0.98); }
+        @keyframes borderRotate { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
-        /* App Main UI */
+        /* --- Login Section --- */
+        #loginOverlay { position: fixed; inset: 0; background: radial-gradient(circle, #1e293b, #0f172a); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .login-card { background: #1e293b; padding: 40px 30px; border-radius: 27px; text-align: center; }
+        .login-card input { width: 100%; padding: 16px; margin-bottom: 18px; border: 2px solid #334155; border-radius: 15px; box-sizing: border-box; outline: none; background: #0f172a; color: white; }
+
+        /* --- App UI --- */
         .app-container { max-width: 500px; margin: auto; padding: 15px; display: none; }
-        .header-card { background: linear-gradient(135deg, #341f97, #4834d4); color: white; padding: 35px 25px; border-radius: 35px; text-align: center; margin-bottom: 12px; box-shadow: 0 10px 20px rgba(72, 52, 212, 0.2); }
-        .bal-val { font-size: 2.8rem; font-weight: 800; margin: 12px 0; letter-spacing: -1px; }
-        .daily-summary { background: var(--dark); color: white; display: grid; grid-template-columns: 1fr 1fr; padding: 18px; border-radius: 25px; text-align: center; margin-bottom: 15px; }
+        .header-card { background: linear-gradient(135deg, #341f97, #4834d4); color: white; padding: 35px 25px; border-radius: 30px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .bal-val { font-size: 2.8rem; font-weight: 800; margin: 12px 0; }
+        .daily-summary { background: #1e293b; display: grid; grid-template-columns: 1fr 1fr; padding: 18px; border-radius: 25px; text-align: center; margin-bottom: 20px; border: 1px solid #334155; }
         
-        .btn-report { background: #6c5ce7; color: white; padding: 16px; border: none; border-radius: 22px; width: 100%; font-weight: bold; cursor: pointer; margin-bottom: 20px; font-size: 1rem; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
-
-        .card { background: var(--white); border-radius: 30px; padding: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        
+        .card-inner { background: #1e293b; border-radius: 27px; padding: 25px; }
         .cat-scroll { overflow-x: auto; white-space: nowrap; margin-bottom: 20px; display: flex; gap: 12px; padding-bottom: 8px; }
-        .cat-item { flex: 0 0 auto; padding: 16px 20px; border-radius: 20px; border: 2px solid #f1f2f6; text-align: center; cursor: pointer; min-width: 80px; transition: 0.3s; }
-        .cat-item.active.plus { background: var(--income); color: white; border-color: var(--income); transform: translateY(-3px); }
-        .cat-item.active.minus { background: var(--expense); color: white; border-color: var(--expense); transform: translateY(-3px); }
+        .cat-item { flex: 0 0 auto; padding: 15px; border-radius: 20px; border: 2px solid #334155; text-align: center; cursor: pointer; min-width: 80px; background: #0f172a; }
+        .cat-item.active.plus { border-color: var(--income); background: rgba(0, 184, 148, 0.2); }
+        .cat-item.active.minus { border-color: var(--expense); background: rgba(235, 77, 75, 0.2); }
 
-        .main-input { width: 100%; padding: 18px; border: 2px solid #f1f2f6; border-radius: 18px; margin-bottom: 15px; box-sizing: border-box; outline: none; font-size: 1rem; }
-        .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(72, 52, 212, 0.3); }
+        .main-input { width: 100%; padding: 18px; border: 2px solid #334155; border-radius: 18px; margin-bottom: 15px; box-sizing: border-box; background: #0f172a; color: white; outline: none; }
+        .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: linear-gradient(45deg, #4834d4, #686de0); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
-        /* Table & History */
-        .report-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .report-table th, .report-table td { padding: 14px 8px; border-bottom: 1px solid #f1f2f6; text-align: left; }
-        .log-item { background: white; padding: 18px; border-radius: 22px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.2rem; padding: 5px; }
-
-        /* Modal Style */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: white; width: 92%; max-width: 480px; padding: 30px; border-radius: 35px; max-height: 85vh; overflow-y: auto; position: relative; }
-        .setting-box { background: #f8f9fa; padding: 20px; border-radius: 25px; margin-bottom: 18px; border: 1px solid #eee; }
+        .log-item { background: #1e293b; padding: 18px; border-radius: 22px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
         
-        .type-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .type-btn { flex: 1; padding: 14px; border: 1px solid #ddd; border-radius: 15px; text-align: center; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .type-btn.active.plus { background: var(--income); color: white; border-color: var(--income); }
-        .type-btn.active.minus { background: var(--expense); color: white; border-color: var(--expense); }
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+        .modal-content { background: #1e293b; width: 92%; max-width: 480px; padding: 25px; border-radius: 30px; max-height: 85vh; overflow-y: auto; color: white; border: 1px solid #334155; }
+        .setting-box { background: #0f172a; padding: 20px; border-radius: 25px; margin-bottom: 18px; border: 1px solid #334155; }
+        
+        .report-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .report-table th, .report-table td { padding: 12px 8px; border-bottom: 1px solid #334155; text-align: left; }
     </style>
 </head>
 <body>
@@ -87,24 +59,26 @@
 <div id="statusIndicator" class="offline">Connecting...</div>
 
 <div id="loginOverlay">
-    <div class="login-card">
-        <h2>🔐 အကောင့်ဝင်ရန်</h2>
-        <input type="text" id="userInput" placeholder="Username" autocomplete="off">
-        <input type="password" id="passInput" placeholder="Password">
-        <button class="btn-login" id="loginBtn">Login ဝင်မည်</button>
-        <p id="loginError" style="color:#eb4d4b; font-size:0.85rem; display:none; margin-top:15px; font-weight:bold;">⚠️ အချက်အလက်များ မှားယွင်းနေပါသည်။</p>
+    <div class="gradient-border" style="width: 88%; max-width: 380px;">
+        <div class="login-card">
+            <h2 style="margin-top:0;">🛡️ စနစ်ဝင်ရောက်ရန်</h2>
+            <input type="text" id="userInput" placeholder="Username">
+            <input type="password" id="passInput" placeholder="Password">
+            <button class="btn-submit" id="loginBtn">Login ဝင်မည်</button>
+            <p id="loginError" style="color:#ff7675; display:none; margin-top:15px; font-weight:bold;">⚠️ အချက်အလက် မှားယွင်းနေပါသည်။</p>
+        </div>
     </div>
 </div>
 
 <div class="app-container" id="app">
     <div class="header-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div id="roleDisplay" style="font-size:0.8rem; background:rgba(255,255,255,0.2); padding:5px 12px; border-radius:15px;">Role: Checking...</div>
-            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">⚙️</button>
+            <div id="roleDisplay" style="font-size:0.75rem; background:rgba(0,0,0,0.3); padding:6px 14px; border-radius:15px;">ROLE: ...</div>
+            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.6rem; cursor:pointer;">⚙️</button>
         </div>
-        <div style="margin-top:15px; font-size:0.9rem; opacity:0.9;">လက်ရှိစုစုပေါင်းလက်ကျန်ငွေ</div>
+        <div style="margin-top:15px; opacity:0.8;">လက်ရှိလက်ကျန်ငွေ</div>
         <div class="bal-val"><span id="totalDisplay">0</span></div>
-        <div style="font-size:0.8rem; opacity:0.8; letter-spacing:1px;">MMK (MYANMAR KYAT)</div>
+        <div style="font-size:0.8rem; opacity:0.6;">MMK (ကျပ်)</div>
     </div>
 
     <div class="daily-summary">
@@ -112,80 +86,66 @@
         <div>အသုံး: <span id="dayOutDisplay" style="color:#ff7675">-0</span></div>
     </div>
 
-    <button class="btn-report" id="annualReportBtn">📊 ၂၀၂၆ ခုနှစ် တစ်နှစ်စာ နှစ်ချုပ်မှတ်တမ်း</button>
+    <button class="btn-submit" style="background: #6c5ce7; margin-bottom: 20px;" id="annualReportBtn">📊 ၂၀၂၆ နှစ်ချုပ်မှတ်တမ်းကြည့်ရန်</button>
 
-    <div class="card">
-        <div class="cat-scroll" id="catRow"></div>
-        <input type="text" id="itemName" class="main-input" placeholder="အကြောင်းအရာ (ဥပမာ - ပစ္စည်းဖိုး)">
-        <input type="number" id="itemAmt" class="main-input" placeholder="ပမာဏ (ကျပ်)">
-        <button class="btn-submit" id="saveBtn">📥 စာရင်းသွင်းမည်</button>
+    <div class="gradient-border">
+        <div class="card-inner">
+            <div class="cat-scroll" id="catRow"></div>
+            <input type="text" id="itemName" class="main-input" placeholder="အကြောင်းအရာ">
+            <input type="number" id="itemAmt" class="main-input" placeholder="ပမာဏ (ကျပ်)">
+            <button class="btn-submit" id="saveBtn">📥 စာရင်းသွင်းမည်</button>
+        </div>
     </div>
 
-    <h3 style="margin:25px 10px 15px; font-size:1.1rem; color:var(--dark);">🕒 လတ်တလော မှတ်တမ်းများ</h3>
+    <h3 style="margin:30px 10px 15px; font-size:1.1rem; color:#a29bfe;">🕒 လတ်တလော မှတ်တမ်းများ</h3>
     <div id="logHistory"></div>
-    <button class="btn-submit" style="background:#636e72; margin-top:30px; margin-bottom:50px;" onclick="location.reload()">🚪 စနစ်မှထွက်မည် (Logout)</button>
+    <button class="btn-submit" style="background:#334155; margin-top:30px; margin-bottom:50px;" onclick="location.reload()">🚪 Logout ထွက်မည်</button>
 </div>
 
 <div id="annualModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; color:var(--primary); text-align:center; font-size:1.4rem;">📈 ၂၀၂၆ နှစ်ချုပ်စာရင်း</h3>
-        <div style="overflow-x:auto;">
-            <table class="report-table">
-                <thead>
-                    <tr><th>လ</th><th style="color:var(--income)">ဝင်ငွေ</th><th style="color:var(--expense)">အသုံး</th><th>အမြတ်</th></tr>
-                </thead>
-                <tbody id="annualBody"></tbody>
-                <tfoot style="background:#f8f9fa; font-weight:bold; border-top:2px solid #eee;">
-                    <tr>
-                        <td>စုစုပေါင်း</td>
-                        <td id="totalInYear" style="color:var(--income)">0</td>
-                        <td id="totalOutYear" style="color:var(--expense)">0</td>
-                        <td id="totalProfitYear">0</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-        <button class="btn-submit" style="background:#dfe6e9; color:#2d3436; margin-top:25px; box-shadow:none;" onclick="document.getElementById('annualModal').style.display='none'">ပိတ်မည်</button>
+        <h3 style="margin-top:0; color:#55efc4; text-align:center;">📈 ၂၀၂၆ နှစ်ချုပ်စာရင်း</h3>
+        <table class="report-table">
+            <thead>
+                <tr><th>လ</th><th>ဝင်ငွေ</th><th>အသုံး</th><th>အမြတ်</th></tr>
+            </thead>
+            <tbody id="annualBody"></tbody>
+        </table>
+        <button class="btn-submit" style="background:#334155; margin-top:20px;" onclick="document.getElementById('annualModal').style.display='none'">ပိတ်မည်</button>
     </div>
 </div>
 
 <div id="settingsModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; text-align:center;">⚙️ စနစ်ပြင်ဆင်ချက်များ</h3>
+        <h3 style="margin-top:0; text-align:center;">⚙️ စနစ်ပြင်ဆင်ချက်</h3>
         
         <div class="setting-box">
-            <h4 style="margin-top:0;">🔐 အကောင့်/Password ပြောင်းရန်</h4>
-            <div style="font-size:0.7rem; color:#666; margin-bottom:5px;">Admin Login:</div>
+            <h4>🔐 Password ပြောင်းရန်</h4>
             <input type="text" id="setAdminUser" class="main-input" placeholder="Admin User">
             <input type="text" id="setAdminPass" class="main-input" placeholder="Admin Pass">
-            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-            <div style="font-size:0.7rem; color:#666; margin-bottom:5px;">Staff Login:</div>
+            <hr style="border:0; border-top:1px solid #334155; margin:15px 0;">
             <input type="text" id="setStaffUser" class="main-input" placeholder="Staff User">
             <input type="text" id="setStaffPass" class="main-input" placeholder="Staff Pass">
-            <button class="btn-submit" style="padding:12px; font-size:0.9rem;" id="saveAccBtn">အကောင့်များ သိမ်းမည်</button>
+            <button class="btn-submit" style="padding:12px; font-size:0.9rem;" id="saveAccBtn">Save Accounts</button>
         </div>
 
         <div class="setting-box">
-            <h4 style="margin-top:0;">📁 အမျိုးအစားများ စီမံရန်</h4>
-            <div id="catEditList" style="margin-bottom:15px; border:1px solid #eee; border-radius:15px; max-height:150px; overflow-y:auto; background:white;"></div>
-            <div class="type-selector">
-                <div id="typePlus" class="type-btn active plus" onclick="window.setNewType('plus')">ဝင်ငွေ (+)</div>
-                <div id="typeMinus" class="type-btn minus" onclick="window.setNewType('minus')">အသုံး (-)</div>
-            </div>
+            <h4>📁 အမျိုးအစားများ စီမံရန်</h4>
+            <div id="catEditList" style="margin-bottom:15px; border:1px solid #334155; border-radius:15px; max-height:120px; overflow-y:auto; background:#0f172a;"></div>
             <div style="display:flex; gap:8px;">
                 <input type="text" id="newCatIcon" class="main-input" placeholder="🎁" style="width:30%;">
                 <input type="text" id="newCatName" class="main-input" placeholder="အမည်" style="width:70%;">
             </div>
-            <button class="btn-submit" style="background:var(--income); padding:12px;" id="addCatBtn">➕ အသစ်ထည့်မည်</button>
+            <button class="btn-submit" style="background:var(--income); padding:12px;" id="addCatBtn">အမျိုးအစားသစ်ထည့်မည်</button>
         </div>
 
         <div class="setting-box">
-            <h4 style="margin-top:0;">💰 မူလလက်ကျန်ငွေ သတ်မှတ်ရန်</h4>
+            <h4>💰 မူလလက်ကျန် သတ်မှတ်ရန်</h4>
             <input type="number" id="openingBalInput" class="main-input">
-            <button class="btn-submit" style="background:#636e72; padding:12px;" id="saveOpenBtn">လက်ကျန်ငွေ သိမ်းမည်</button>
+            <button class="btn-submit" style="background:#636e72; padding:12px;" id="saveOpenBtn">Save Balance</button>
         </div>
 
-        <button class="btn-submit" style="background:#dfe6e9; color:#2d3436;" id="closeSettings">ပြန်ထွက်မည်</button>
+        <button class="btn-submit" style="background:#334155;" id="closeSettings">ပိတ်မည်</button>
     </div>
 </div>
 
@@ -203,14 +163,13 @@
         measurementId: "G-DT9N6G4MQS"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const firebase_app = initializeApp(firebaseConfig);
+    const db = getFirestore(firebase_app);
 
     let records = [];
     let isAdmin = false;
     let selectedCatId = 1;
     let openingBal = 0;
-    let newCatType = 'plus';
     let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
     let categories = [{ id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" }, { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }];
 
@@ -235,18 +194,11 @@
         await setDoc(doc(db, "settings", "main_config"), { openingBal, categories, loginConfigs }, { merge: true });
     }
 
-    window.setCat = (id) => { selectedCatId = id; renderUI(); };
-    window.setNewType = (type) => {
-        newCatType = type;
-        document.getElementById('typePlus').className = `type-btn ${type==='plus'?'active plus':''}`;
-        document.getElementById('typeMinus').className = `type-btn ${type==='minus'?'active minus':''}`;
-    };
-
     function renderUI() {
         const catRow = document.getElementById('catRow');
         catRow.innerHTML = categories.map(c => `
             <div class="cat-item ${c.id === selectedCatId ? 'active ' + c.type : ''}" onclick="window.setCat(${c.id})">
-                <div style="font-size:1.4rem;">${c.icon}</div><div style="font-size:0.75rem; margin-top:8px; font-weight:bold;">${c.name}</div>
+                <div style="font-size:1.5rem;">${c.icon}</div><div style="font-size:0.75rem; margin-top:8px;">${c.name}</div>
             </div>`).join('');
 
         let net = 0, dIn = 0, dOut = 0;
@@ -257,11 +209,11 @@
             const isP = r.type === 'plus';
             net += isP ? r.amt : -r.amt;
             dIn += isP ? r.amt : 0; dOut += isP ? 0 : r.amt;
-            history.innerHTML += `<div class="log-item" style="border-left-color:${isP?'var(--income)':'var(--expense)'}">
-                <div><b style="font-size:1rem;">${r.name}</b><br><small style="color:#666;">${r.icon} ${r.catName}</small></div>
+            history.innerHTML += `<div class="log-item" style="border-left-color:${isP?'#00b894':'#eb4d4b'}">
+                <div><b>${r.name}</b><br><small style="color:#a29bfe;">${r.catName}</small></div>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <b style="color:${isP?'var(--income)':'var(--expense)'}; font-size:1.1rem;">${isP?'+':'-'}${r.amt.toLocaleString()}</b>
-                    ${isAdmin ? `<button class="del-btn" onclick="window.deleteRec('${r.id}')">✖</button>` : ''}
+                    <b style="color:${isP?'#55efc4':'#ff7675'};">${isP?'+':'-'}${r.amt.toLocaleString()}</b>
+                    ${isAdmin ? `<button style="color:#ff7675; border:none; background:none; font-size:1.2rem;" onclick="window.deleteRec('${r.id}')">✖</button>` : ''}
                 </div></div>`;
         });
         document.getElementById('totalDisplay').innerText = (openingBal + net).toLocaleString();
@@ -269,52 +221,51 @@
         document.getElementById('dayOutDisplay').innerText = "-" + dOut.toLocaleString();
     }
 
+    // Login logic
     document.getElementById('loginBtn').onclick = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
-        if(u === loginConfigs.admin.u && p === loginConfigs.admin.p) { isAdmin = true; startApp("Admin"); }
-        else if(u === loginConfigs.staff.u && p === loginConfigs.staff.p) { isAdmin = false; startApp("Staff"); }
+        if(u === loginConfigs.admin.u && p === loginConfigs.admin.p) { isAdmin = true; startApp("ADMIN"); }
+        else if(u === loginConfigs.staff.u && p === loginConfigs.staff.p) { isAdmin = false; startApp("STAFF"); }
         else { document.getElementById('loginError').style.display = 'block'; }
     };
 
     function startApp(role) {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-        document.getElementById('roleDisplay').innerText = "Role: " + role;
+        document.getElementById('roleDisplay').innerText = "ROLE: " + role;
         if(!isAdmin) document.getElementById('settingBtn').style.display = 'none';
         renderUI();
     }
 
+    // Record saving
     document.getElementById('saveBtn').onclick = async () => {
         const amt = parseFloat(document.getElementById('itemAmt').value);
-        if(!amt) return alert("ပမာဏ အတိအကျ ထည့်ပေးပါဗျာ။");
+        if(!amt) return alert("ပမာဏ ထည့်ပါ");
         const c = categories.find(x => x.id === selectedCatId);
         await addDoc(collection(db, "records"), {
-            name: document.getElementById('itemName').value || "မှတ်ချက်မရှိ",
+            name: document.getElementById('itemName').value || "စာရင်း",
             amt: amt, catName: c.name, icon: c.icon, type: c.type, timestamp: Date.now()
         });
         document.getElementById('itemAmt').value = ''; document.getElementById('itemName').value = '';
     };
 
+    // Annual Report logic
     document.getElementById('annualReportBtn').onclick = () => {
         let mData = Array(12).fill(0).map(() => ({ in: 0, out: 0 }));
-        let tIn = 0, tOut = 0;
         records.forEach(r => {
             const m = new Date(r.timestamp).getMonth();
-            if(r.type === 'plus') { mData[m].in += r.amt; tIn += r.amt; }
-            else { mData[m].out += r.amt; tOut += r.amt; }
+            if(r.type === 'plus') mData[m].in += r.amt; else mData[m].out += r.amt;
         });
-        const months = ["ဇန်နဝါရီ","ဖေဖော်ဝါရီ","မတ်","ဧပြီ","မေ","ဇွန်","ဇူလိုင်","သြဂုတ်","စက်တင်ဘာ","အောက်တိုဘာ","နိုဝင်ဘာ","ဒီဇင်ဘာ"];
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
         document.getElementById('annualBody').innerHTML = mData.map((m, i) => `
-            <tr><td>${months[i]}</td><td style="color:var(--income)">${m.in.toLocaleString()}</td>
-            <td style="color:var(--expense)">${m.out.toLocaleString()}</td><td style="font-weight:bold;">${(m.in-m.out).toLocaleString()}</td></tr>
+            <tr><td>${months[i]}</td><td style="color:#55efc4">${m.in.toLocaleString()}</td>
+            <td style="color:#ff7675">${m.out.toLocaleString()}</td><td>${(m.in-m.out).toLocaleString()}</td></tr>
         `).join('');
-        document.getElementById('totalInYear').innerText = tIn.toLocaleString();
-        document.getElementById('totalOutYear').innerText = tOut.toLocaleString();
-        document.getElementById('totalProfitYear').innerText = (tIn - tOut).toLocaleString();
         document.getElementById('annualModal').style.display = 'flex';
     };
 
+    // Settings logic
     document.getElementById('settingBtn').onclick = () => {
         document.getElementById('openingBalInput').value = openingBal;
         document.getElementById('setAdminUser').value = loginConfigs.admin.u;
@@ -327,14 +278,14 @@
 
     function renderEditCats() {
         document.getElementById('catEditList').innerHTML = categories.map(c => `
-            <div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee; align-items:center;">
-                <span style="font-weight:bold;">${c.icon} ${c.name} (${c.type})</span>
-                <span style="color:#eb4d4b; cursor:pointer; font-weight:bold; padding:5px;" onclick="window.removeCat(${c.id})">ဖျက်မည်</span>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #334155; align-items:center;">
+                <span>${c.icon} ${c.name}</span>
+                <span style="color:#ff7675; cursor:pointer;" onclick="window.removeCat(${c.id})">ဖျက်</span>
             </div>`).join('');
     }
 
     window.removeCat = async (id) => {
-        if(confirm("ဤအမျိုးအစားကို အပြီးဖျက်မှာ သေချာပါသလား?")) {
+        if(confirm("အမျိုးအစားကို ဖျက်မှာလား?")) {
             categories = categories.filter(c => c.id !== id);
             await saveAllConfig(); renderEditCats(); renderUI();
         }
@@ -342,10 +293,9 @@
 
     document.getElementById('addCatBtn').onclick = async () => {
         const name = document.getElementById('newCatName').value;
-        if(!name) return alert("အမျိုးအစား အမည် ထည့်ပါဗျာ။");
-        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "📦", name, type: newCatType });
+        if(!name) return alert("အမည် ထည့်ပါ");
+        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "📦", name, type: "plus" });
         await saveAllConfig(); renderEditCats(); renderUI();
-        document.getElementById('newCatName').value = '';
     };
 
     document.getElementById('saveAccBtn').onclick = async () => {
@@ -353,18 +303,19 @@
         loginConfigs.admin.p = document.getElementById('setAdminPass').value;
         loginConfigs.staff.u = document.getElementById('setStaffUser').value;
         loginConfigs.staff.p = document.getElementById('setStaffPass').value;
-        await saveAllConfig(); alert("Login အချက်အလက်များ ပြောင်းလဲပြီးပါပြီ။");
+        await saveAllConfig(); alert("Accounts Saved!");
     };
 
     document.getElementById('saveOpenBtn').onclick = async () => {
         openingBal = parseFloat(document.getElementById('openingBalInput').value) || 0;
-        await saveAllConfig(); renderUI(); alert("မူလလက်ကျန်ငွေ ပြင်ဆင်ပြီးပါပြီ။");
+        await saveAllConfig(); renderUI(); alert("Balance Saved!");
     };
 
-    window.deleteRec = async (id) => { if(confirm("ဤမှတ်တမ်းကို ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
+    window.deleteRec = async (id) => { if(confirm("ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
     document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
+    window.setCat = (id) => { selectedCatId = id; renderUI(); };
 
-    // Status Check
+    // Status Checker
     setInterval(() => {
         const dot = document.getElementById('statusIndicator');
         if(navigator.onLine) { dot.className="online"; dot.innerText="Online 🟢"; }
