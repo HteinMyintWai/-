@@ -3,40 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Business Wallet 2026 - Firebase Pro</title>
+    <title>Smart Business Wallet 2026 - Master Pro</title>
     <style>
         :root { --primary: #4834d4; --income: #00b894; --expense: #eb4d4b; --dark: #2d3436; --white: #ffffff; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        /* Connection Status Style */
-        #statusIndicator {
-            position: fixed; top: 10px; right: 10px; padding: 5px 12px;
-            border-radius: 20px; font-size: 0.7rem; font-weight: bold;
-            z-index: 10001; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .online { background: #dff9fb; color: #00b894; border: 1px solid #00b894; }
-        .offline { background: #fab1a0; color: #d63031; border: 1px solid #d63031; }
+        /* Connection Status */
+        #statusIndicator { position: fixed; top: 10px; right: 10px; padding: 6px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; z-index: 10001; transition: 0.3s; }
+        .online { background: #e3fcef; color: #00b894; border: 1px solid #00b894; }
+        .offline { background: #ffe9e9; color: #eb4d4b; border: 1px solid #eb4d4b; }
 
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .login-card { background: white; padding: 35px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+        #loginOverlay { position: fixed; inset: 0; background: var(--primary); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .login-card { background: white; padding: 35px; border-radius: 30px; width: 85%; max-width: 350px; text-align: center; }
         .login-card input { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 15px; box-sizing: border-box; outline: none; }
         
         .app-container { max-width: 500px; margin: auto; padding: 15px; display: none; }
         .header-card { background: linear-gradient(135deg, #341f97, #4834d4); color: white; padding: 30px 20px; border-radius: 30px; text-align: center; margin-bottom: 10px; position: relative; }
-        .bal-val { font-size: 3rem; font-weight: 800; margin: 10px 0; }
-        .daily-summary { background: var(--dark); color: white; display: grid; grid-template-columns: 1fr 1fr; padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
+        .bal-val { font-size: 2.8rem; font-weight: 800; margin: 10px 0; }
         
+        .daily-summary { background: var(--dark); color: white; display: grid; grid-template-columns: 1fr 1fr; padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
         .card { background: var(--white); border-radius: 25px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
         .cat-scroll { overflow-x: auto; white-space: nowrap; margin-bottom: 15px; padding-bottom: 5px; display: flex; gap: 10px; }
-        .cat-item { flex: 0 0 auto; padding: 15px 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; min-width: 80px; transition: 0.3s; background: white; }
+        .cat-item { flex: 0 0 auto; padding: 15px 20px; border-radius: 15px; border: 1px solid #eee; text-align: center; cursor: pointer; min-width: 80px; background: white; }
         .cat-item.active.plus { background: var(--income); color: white; border-color: var(--income); }
         .cat-item.active.minus { background: var(--expense); color: white; border-color: var(--expense); }
-        
+
         .main-input { width: 100%; padding: 16px; border: 1.5px solid #eee; border-radius: 15px; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
         .log-item { background: white; padding: 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; padding: 5px; font-size: 1.1rem; }
+        .del-btn { color: var(--expense); border: none; background: none; cursor: pointer; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -46,8 +43,8 @@
 <div id="loginOverlay">
     <div class="login-card">
         <h2 style="color:var(--primary); margin-top:0;">🔐 စာရင်းဝင်မည်</h2>
-        <input type="text" id="userInput" placeholder="အသုံးပြုသူအမည်">
-        <input type="password" id="passInput" placeholder="လျှို့ဝှက်နံပါတ်">
+        <input type="text" id="userInput" placeholder="Username">
+        <input type="password" id="passInput" placeholder="Password">
         <button class="btn-submit" id="loginBtn">Login ဝင်မည်</button>
         <p id="loginError" style="color:red; font-size:0.8rem; display:none; margin-top:10px;">⚠️ မှားယွင်းနေပါသည်။</p>
     </div>
@@ -57,12 +54,11 @@
     <div class="header-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div id="roleDisplay" style="font-size:0.8rem; opacity:0.8;">Role: Loading...</div>
-            <div style="display:flex; gap:10px;">
-                <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">⚙️</button>
-            </div>
+            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">⚙️</button>
         </div>
         <div style="margin-top:10px;">စုစုပေါင်းလက်ကျန်ငွေ</div>
-        <div class="bal-val"><span id="totalDisplay">0</span> ကျပ်</div>
+        <div class="bal-val"><span id="totalDisplay">0</span></div>
+        <div style="font-size:0.9rem; opacity:0.9;">MMK (ကျပ်)</div>
     </div>
 
     <div class="daily-summary">
@@ -83,12 +79,11 @@
 </div>
 
 <script type="module">
-    // Firebase SDKs များအား Version 10.8.0 ဖြင့် ချိတ်ဆက်ခြင်း
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // သင်၏ Firebase Configuration (ပုံပါအတိုင်း အသစ်လဲလှယ်ထားပါသည်)
+    // ပေးပို့ထားသော Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyAo0NxlLIUtWzIJJx8Ein5Ftidacw0W9Lw",
         authDomain: "myrecordsystem-af249.firebaseapp.com",
@@ -99,15 +94,15 @@
         measurementId: "G-DT9N6G4MQS"
     };
 
-    // Firebase ကို စတင်အသုံးပြုခြင်း
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
-    // --- Connection Monitoring ---
+    // --- Connection Status Sync ---
     const statusDiv = document.getElementById('statusIndicator');
     function updateStatus() {
-        if (navigator.onLine) {
+        if(navigator.onLine) {
             statusDiv.innerText = "Cloud Online 🟢";
             statusDiv.className = "online";
         } else {
@@ -119,25 +114,26 @@
     window.addEventListener('offline', updateStatus);
     updateStatus();
 
-    // --- App Logic ---
+    // --- State & Config ---
     let records = [];
     let isAdmin = false;
-    let openingBal = 0;
+    let selectedCatId = 1;
     const categories = [
         { id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" },
         { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }
     ];
-    let selectedCatId = 1;
 
-    // Real-time Data Sync
+    // Firestore Real-time Sync
     onSnapshot(query(collection(db, "records"), orderBy("timestamp", "desc")), (snapshot) => {
         records = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderUI();
     });
 
+    // Login logic
     window.handleLogin = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
+        // Default login: admin/1234 or staff/5678
         if(u === "admin" && p === "1234") { isAdmin = true; startApp("Admin"); }
         else if(u === "staff" && p === "5678") { isAdmin = false; startApp("Staff"); }
         else { document.getElementById('loginError').style.display = 'block'; }
@@ -172,8 +168,7 @@
                     ${isAdmin ? `<button class="del-btn" onclick="window.deleteRec('${r.id}')">✖</button>` : ''}
                 </div></div>`;
         });
-
-        document.getElementById('totalDisplay').innerText = (openingBal + net).toLocaleString();
+        document.getElementById('totalDisplay').innerText = net.toLocaleString();
         document.getElementById('dayInDisplay').innerText = dIn.toLocaleString();
         document.getElementById('dayOutDisplay').innerText = dOut.toLocaleString();
     }
@@ -191,13 +186,15 @@
             });
             document.getElementById('itemAmt').value = ''; 
             document.getElementById('itemName').value = '';
-        } catch (e) { alert("Error: " + e.message); }
+        } catch (e) { alert("Error: Database ချိတ်ဆက်မှု မရှိသေးပါ။"); }
     };
 
     window.deleteRec = async (id) => { if(confirm("ဖျက်မှာလား?")) await deleteDoc(doc(db, "records", id)); };
 
+    // Event Listeners
     document.getElementById('loginBtn').onclick = window.handleLogin;
     document.getElementById('saveBtn').onclick = window.saveData;
 </script>
 </body>
 </html>
+
