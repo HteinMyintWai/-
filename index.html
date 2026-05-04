@@ -3,55 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Business Wallet 2026 - Ultimate Edition</title>
+    <title>Smart Wallet 2026 - Ultimate Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4834d4; --income: #00b894; --expense: #eb4d4b; --dark: #2d3436; --white: #ffffff; --bg: #0f172a; }
-        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); margin: 0; padding: 0; color: white; overflow-x: hidden; }
-        
-        /* Status Bar */
-        #statusIndicator { position: fixed; top: 15px; right: 15px; padding: 6px 14px; border-radius: 25px; font-size: 0.7rem; font-weight: bold; z-index: 10001; }
-        .online { background: #00b894; color: white; }
-        .offline { background: #d63031; color: white; }
-
-        /* --- Animated Gradient Border Wrapper --- */
-        .gradient-border {
-            position: relative; padding: 3px;
-            background: linear-gradient(90deg, #00dbde, #fc00ff, #00dbde);
-            background-size: 200% 200%;
-            animation: borderRotate 3s linear infinite;
-            border-radius: 30px;
+        :root {
+            --primary: #6366f1;
+            --income: #10b981;
+            --expense: #ef4444;
+            --bg: #030712;
+            --glass: rgba(31, 41, 55, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
-        @keyframes borderRotate { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 
-        /* --- Login Section --- */
-        #loginOverlay { position: fixed; inset: 0; background: radial-gradient(circle, #1e293b, #0f172a); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .login-card { background: #1e293b; padding: 40px 30px; border-radius: 27px; text-align: center; }
-        .login-card input { width: 100%; padding: 16px; margin-bottom: 18px; border: 2px solid #334155; border-radius: 15px; box-sizing: border-box; outline: none; background: #0f172a; color: white; }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            background-image: radial-gradient(circle at center, #1e1b4b 0%, #030712 100%);
+            margin: 0; color: #f3f4f6; min-height: 100vh; overflow-x: hidden;
+        }
 
-        /* --- App UI --- */
-        .app-container { max-width: 500px; margin: auto; padding: 15px; display: none; }
-        .header-card { background: linear-gradient(135deg, #341f97, #4834d4); color: white; padding: 35px 25px; border-radius: 30px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .bal-val { font-size: 2.8rem; font-weight: 800; margin: 12px 0; }
-        .daily-summary { background: #1e293b; display: grid; grid-template-columns: 1fr 1fr; padding: 18px; border-radius: 25px; text-align: center; margin-bottom: 20px; border: 1px solid #334155; }
-        
-        .card-inner { background: #1e293b; border-radius: 27px; padding: 25px; }
-        .cat-scroll { overflow-x: auto; white-space: nowrap; margin-bottom: 20px; display: flex; gap: 12px; padding-bottom: 8px; }
-        .cat-item { flex: 0 0 auto; padding: 15px; border-radius: 20px; border: 2px solid #334155; text-align: center; cursor: pointer; min-width: 80px; background: #0f172a; }
-        .cat-item.active.plus { border-color: var(--income); background: rgba(0, 184, 148, 0.2); }
-        .cat-item.active.minus { border-color: var(--expense); background: rgba(235, 77, 75, 0.2); }
+        /* --- Status Bar --- */
+        #statusIndicator {
+            position: fixed; top: 15px; right: 15px;
+            padding: 6px 14px; border-radius: 50px;
+            font-size: 0.7rem; font-weight: 600; z-index: 10001;
+        }
+        .online { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .offline { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
 
-        .main-input { width: 100%; padding: 18px; border: 2px solid #334155; border-radius: 18px; margin-bottom: 15px; box-sizing: border-box; background: #0f172a; color: white; outline: none; }
-        .btn-submit { width: 100%; padding: 18px; border: none; border-radius: 20px; background: linear-gradient(45deg, #4834d4, #686de0); color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
-        
-        .log-item { background: #1e293b; padding: 18px; border-radius: 22px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #ccc; }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
-        .modal-content { background: #1e293b; width: 92%; max-width: 480px; padding: 25px; border-radius: 30px; max-height: 85vh; overflow-y: auto; color: white; border: 1px solid #334155; }
-        .setting-box { background: #0f172a; padding: 20px; border-radius: 25px; margin-bottom: 18px; border: 1px solid #334155; }
-        
-        .report-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .report-table th, .report-table td { padding: 12px 8px; border-bottom: 1px solid #334155; text-align: left; }
+        /* --- Login Section (Centered) --- */
+        #loginOverlay {
+            position: fixed; inset: 0; background: #030712;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10000; padding: 20px;
+        }
+
+        .gradient-border-wrap {
+            position: relative; width: 100%; max-width: 380px;
+            padding: 3px; border-radius: 30px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #6366f1);
+            background-size: 200% 200%;
+            animation: moveGradient 3s linear infinite;
+        }
+        @keyframes moveGradient { 0% {background-position: 0% 50%;} 100% {background-position: 200% 50%;} }
+
+        .login-card { background: #111827; padding: 45px 30px; border-radius: 27px; text-align: center; }
+
+        /* --- App Container --- */
+        .app-container { max-width: 500px; margin: auto; padding: 20px; display: none; }
+
+        .header-card {
+            background: linear-gradient(135deg, #4f46e5, #312e81);
+            padding: 30px 25px; border-radius: 30px;
+            text-align: center; margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .bal-val { font-size: 2.8rem; font-weight: 800; margin: 10px 0; }
+
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .sum-box { background: var(--glass); padding: 18px; border-radius: 20px; border: 1px solid var(--glass-border); text-align: center; }
+
+        /* --- Input Controls --- */
+        .card-inner { background: #111827; border-radius: 28px; padding: 25px; }
+        .cat-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 20px; }
+
+        .cat-item {
+            flex: 0 0 auto; background: #1f2937; padding: 15px;
+            border-radius: 20px; min-width: 75px; text-align: center;
+            border: 2px solid transparent; cursor: pointer; transition: 0.3s;
+        }
+        .cat-item.active.plus { border-color: var(--income); background: rgba(16, 185, 129, 0.1); }
+        .cat-item.active.minus { border-color: var(--expense); background: rgba(239, 68, 68, 0.1); }
+
+        .main-input {
+            width: 100%; padding: 16px; margin-bottom: 15px;
+            border-radius: 15px; border: 1px solid #374151;
+            background: #030712; color: white; box-sizing: border-box;
+            outline: none; font-size: 1rem;
+        }
+
+        .btn-submit {
+            width: 100%; padding: 17px; border: none; border-radius: 18px;
+            background: var(--primary); color: white; font-weight: 700;
+            cursor: pointer; transition: 0.3s; font-size: 1rem;
+        }
+
+        .log-item {
+            background: var(--glass); padding: 18px; border-radius: 22px;
+            margin-bottom: 12px; display: flex; justify-content: space-between;
+            align-items: center; border-left: 5px solid #4b5563;
+        }
+
+        /* --- Modals --- */
+        .modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            z-index: 2000; justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .modal-content {
+            background: #111827; width: 100%; max-width: 440px;
+            padding: 30px; border-radius: 30px; border: 1px solid var(--glass-border);
+            max-height: 85vh; overflow-y: auto;
+        }
+
+        .setting-box { background: #030712; padding: 15px; border-radius: 20px; margin-bottom: 18px; border: 1px solid #1f2937; }
+
+        /* --- Toggle Switch for Type --- */
+        .type-selector {
+            display: flex; background: #000; border-radius: 12px; padding: 5px; margin-bottom: 15px;
+        }
+        .type-btn {
+            flex: 1; padding: 10px; border-radius: 10px; border: none; color: #9ca3af;
+            background: none; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .type-btn.active.plus { background: var(--income); color: white; }
+        .type-btn.active.minus { background: var(--expense); color: white; }
+
+        /* --- Modern Account Update Style --- */
+        .account-update-item {
+            background: #1f2937; padding: 15px; border-radius: 18px; margin-bottom: 10px;
+            display: flex; flex-direction: column; gap: 8px; border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .report-table { width: 100%; border-collapse: collapse; }
+        .report-table th, .report-table td { padding: 12px 5px; border-bottom: 1px solid #1f2937; text-align: left; }
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -59,13 +137,14 @@
 <div id="statusIndicator" class="offline">Connecting...</div>
 
 <div id="loginOverlay">
-    <div class="gradient-border" style="width: 88%; max-width: 380px;">
+    <div class="gradient-border-wrap">
         <div class="login-card">
-            <h2 style="margin-top:0;">🛡️ စနစ်ဝင်ရောက်ရန်</h2>
-            <input type="text" id="userInput" placeholder="Username">
-            <input type="password" id="passInput" placeholder="Password">
-            <button class="btn-submit" id="loginBtn">Login ဝင်မည်</button>
-            <p id="loginError" style="color:#ff7675; display:none; margin-top:15px; font-weight:bold;">⚠️ အချက်အလက် မှားယွင်းနေပါသည်။</p>
+            <div style="font-size: 3.5rem; margin-bottom: 15px;">🛡️</div>
+            <h2 style="margin-bottom: 25px; font-weight: 800;">System Login</h2>
+            <input type="text" id="userInput" class="main-input" placeholder="Username">
+            <input type="password" id="passInput" class="main-input" placeholder="Password">
+            <button class="btn-submit" id="loginBtn">Login ဝင်ရောက်မည်</button>
+            <p id="loginError" style="color:var(--expense); display:none; margin-top:15px; font-weight:bold;">⚠️ အချက်အလက် မှားယွင်းနေပါသည်။</p>
         </div>
     </div>
 </div>
@@ -73,22 +152,28 @@
 <div class="app-container" id="app">
     <div class="header-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div id="roleDisplay" style="font-size:0.75rem; background:rgba(0,0,0,0.3); padding:6px 14px; border-radius:15px;">ROLE: ...</div>
-            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.6rem; cursor:pointer;">⚙️</button>
+            <div id="roleDisplay" style="font-size:0.7rem; background:rgba(0,0,0,0.3); padding:6px 12px; border-radius:12px;">ROLE: ...</div>
+            <button id="settingBtn" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">⚙️</button>
         </div>
-        <div style="margin-top:15px; opacity:0.8;">လက်ရှိလက်ကျန်ငွေ</div>
+        <div style="margin-top:20px; opacity:0.8;">လက်ရှိလက်ကျန်ငွေ</div>
         <div class="bal-val"><span id="totalDisplay">0</span></div>
-        <div style="font-size:0.8rem; opacity:0.6;">MMK (ကျပ်)</div>
+        <div style="font-size:0.8rem; opacity:0.5;">MMK (ကျပ်)</div>
     </div>
 
-    <div class="daily-summary">
-        <div>ဝင်ငွေ: <span id="dayInDisplay" style="color:#55efc4">+0</span></div>
-        <div>အသုံး: <span id="dayOutDisplay" style="color:#ff7675">-0</span></div>
+    <div class="summary-grid">
+        <div class="sum-box">
+            <div style="font-size:0.75rem; color:#9ca3af;">ဝင်ငွေ</div>
+            <div id="dayInDisplay" style="color:var(--income); font-weight:800;">+0</div>
+        </div>
+        <div class="sum-box">
+            <div style="font-size:0.75rem; color:#9ca3af;">အသုံး</div>
+            <div id="dayOutDisplay" style="color:var(--expense); font-weight:800;">-0</div>
+        </div>
     </div>
 
-    <button class="btn-submit" style="background: #6c5ce7; margin-bottom: 20px;" id="annualReportBtn">📊 ၂၀၂၆ နှစ်ချုပ်မှတ်တမ်းကြည့်ရန်</button>
+    <button class="btn-submit" style="background: #374151; margin-bottom: 25px;" id="annualReportBtn">📊 ၂၀၂၆ နှစ်ချုပ်စာရင်းကြည့်ရန်</button>
 
-    <div class="gradient-border">
+    <div class="gradient-border-wrap" style="max-width: none;">
         <div class="card-inner">
             <div class="cat-scroll" id="catRow"></div>
             <input type="text" id="itemName" class="main-input" placeholder="အကြောင်းအရာ">
@@ -97,55 +182,77 @@
         </div>
     </div>
 
-    <h3 style="margin:30px 10px 15px; font-size:1.1rem; color:#a29bfe;">🕒 လတ်တလော မှတ်တမ်းများ</h3>
+    <h3 style="margin:35px 5px 15px; font-size:1.1rem;">🕒 လတ်တလော မှတ်တမ်းများ</h3>
     <div id="logHistory"></div>
-    <button class="btn-submit" style="background:#334155; margin-top:30px; margin-bottom:50px;" onclick="location.reload()">🚪 Logout ထွက်မည်</button>
+    <button class="btn-submit" style="background:transparent; color:#9ca3af; margin:40px 0;" onclick="location.reload()">🚪 Logout ထွက်မည်</button>
 </div>
 
 <div id="annualModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; color:#55efc4; text-align:center;">📈 ၂၀၂၆ နှစ်ချုပ်စာရင်း</h3>
+        <h3 style="text-align:center; color:var(--income); margin-top:0;">၂၀၂၆ ဘဏ္ဍာရေးအစီရင်ခံစာ</h3>
         <table class="report-table">
-            <thead>
-                <tr><th>လ</th><th>ဝင်ငွေ</th><th>အသုံး</th><th>အမြတ်</th></tr>
-            </thead>
+            <thead><tr><th>လ</th><th>ဝင်ငွေ</th><th>အသုံး</th><th>အမြတ်</th></tr></thead>
             <tbody id="annualBody"></tbody>
         </table>
-        <button class="btn-submit" style="background:#334155; margin-top:20px;" onclick="document.getElementById('annualModal').style.display='none'">ပိတ်မည်</button>
+        <button class="btn-submit" style="background:#1f2937; margin-top:25px;" onclick="document.getElementById('annualModal').style.display='none'">ပိတ်မည်</button>
     </div>
 </div>
 
 <div id="settingsModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; text-align:center;">⚙️ စနစ်ပြင်ဆင်ချက်</h3>
+        <h3 style="text-align:center; margin-top:0;">စနစ်ပြင်ဆင်ချက်များ</h3>
         
-        <div class="setting-box">
-            <h4>🔐 Password ပြောင်းရန်</h4>
-            <input type="text" id="setAdminUser" class="main-input" placeholder="Admin User">
-            <input type="text" id="setAdminPass" class="main-input" placeholder="Admin Pass">
-            <hr style="border:0; border-top:1px solid #334155; margin:15px 0;">
-            <input type="text" id="setStaffUser" class="main-input" placeholder="Staff User">
-            <input type="text" id="setStaffPass" class="main-input" placeholder="Staff Pass">
-            <button class="btn-submit" style="padding:12px; font-size:0.9rem;" id="saveAccBtn">Save Accounts</button>
+        <div class="setting-box" style="border-left: 4px solid var(--primary);">
+            <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="document.getElementById('accUpdateModal').style.display='flex'">
+                <h4 style="margin:0; font-size:0.95rem;">🔐 Accounts စီမံခြင်း</h4>
+                <span style="font-size:1.2rem;">➔</span>
+            </div>
         </div>
 
         <div class="setting-box">
-            <h4>📁 အမျိုးအစားများ စီမံရန်</h4>
-            <div id="catEditList" style="margin-bottom:15px; border:1px solid #334155; border-radius:15px; max-height:120px; overflow-y:auto; background:#0f172a;"></div>
+            <h4 style="margin-top:0; font-size:0.9rem; color:var(--income);">📁 အမျိုးအစားများ စီမံရန်</h4>
+            <div id="catEditList" style="margin-bottom:15px; border-radius:12px; max-height:120px; overflow-y:auto; background:#000;"></div>
+            
+            <div class="type-selector">
+                <button class="type-btn active plus" id="typePlus" onclick="window.switchNewCatType('plus')">ဝင်ငွေ</button>
+                <button class="type-btn" id="typeMinus" onclick="window.switchNewCatType('minus')">အသုံးစရိတ်</button>
+            </div>
+
             <div style="display:flex; gap:8px;">
                 <input type="text" id="newCatIcon" class="main-input" placeholder="🎁" style="width:30%;">
                 <input type="text" id="newCatName" class="main-input" placeholder="အမည်" style="width:70%;">
             </div>
-            <button class="btn-submit" style="background:var(--income); padding:12px;" id="addCatBtn">အမျိုးအစားသစ်ထည့်မည်</button>
+            <button class="btn-submit" style="background:var(--income); padding:10px; font-size:0.8rem;" id="addCatBtn">အမျိုးအစားသစ်ထည့်မည်</button>
         </div>
 
         <div class="setting-box">
-            <h4>💰 မူလလက်ကျန် သတ်မှတ်ရန်</h4>
+            <h4 style="margin-top:0; font-size:0.9rem; color:#9ca3af;">💰 မူလလက်ကျန် သတ်မှတ်ရန်</h4>
             <input type="number" id="openingBalInput" class="main-input">
-            <button class="btn-submit" style="background:#636e72; padding:12px;" id="saveOpenBtn">Save Balance</button>
+            <button class="btn-submit" style="background:#4b5563; padding:10px; font-size:0.8rem;" id="saveOpenBtn">Save Balance</button>
         </div>
 
-        <button class="btn-submit" style="background:#334155;" id="closeSettings">ပိတ်မည်</button>
+        <button class="btn-submit" id="closeSettings">ပိတ်မည်</button>
+    </div>
+</div>
+
+<div id="accUpdateModal" class="modal">
+    <div class="modal-content" style="border-top: 5px solid var(--primary);">
+        <h3 style="text-align:center; margin-top:0;">🛡️ Account Security Update</h3>
+        
+        <div class="account-update-item">
+            <span style="font-weight:bold; color:var(--primary); font-size:0.8rem;">ADMIN ACCOUNT</span>
+            <input type="text" id="setAdminUser" class="main-input" placeholder="New Admin Username" style="margin-bottom:8px;">
+            <input type="password" id="setAdminPass" class="main-input" placeholder="New Admin Password" style="margin-bottom:0;">
+        </div>
+
+        <div class="account-update-item">
+            <span style="font-weight:bold; color:#a855f7; font-size:0.8rem;">STAFF ACCOUNT</span>
+            <input type="text" id="setStaffUser" class="main-input" placeholder="New Staff Username" style="margin-bottom:8px;">
+            <input type="password" id="setStaffPass" class="main-input" placeholder="New Staff Password" style="margin-bottom:0;">
+        </div>
+
+        <button class="btn-submit" id="saveAccBtn" style="margin-top:10px; background: linear-gradient(to right, #6366f1, #a855f7);">Apply Updates</button>
+        <button class="btn-submit" style="background:transparent; color:#9ca3af; margin-top:5px; font-size:0.9rem;" onclick="document.getElementById('accUpdateModal').style.display='none'">Cancel</button>
     </div>
 </div>
 
@@ -169,6 +276,7 @@
     let records = [];
     let isAdmin = false;
     let selectedCatId = 1;
+    let newCatType = 'plus';
     let openingBal = 0;
     let loginConfigs = { admin: {u:"admin", p:"1234"}, staff: {u:"staff", p:"5678"} };
     let categories = [{ id: 1, icon: "💰", name: "ဝင်ငွေ", type: "plus" }, { id: 2, icon: "🛒", name: "အသုံး", type: "minus" }];
@@ -198,7 +306,7 @@
         const catRow = document.getElementById('catRow');
         catRow.innerHTML = categories.map(c => `
             <div class="cat-item ${c.id === selectedCatId ? 'active ' + c.type : ''}" onclick="window.setCat(${c.id})">
-                <div style="font-size:1.5rem;">${c.icon}</div><div style="font-size:0.75rem; margin-top:8px;">${c.name}</div>
+                <div style="font-size:1.5rem;">${c.icon}</div><div style="font-size:0.7rem; margin-top:5px; font-weight:bold;">${c.name}</div>
             </div>`).join('');
 
         let net = 0, dIn = 0, dOut = 0;
@@ -209,11 +317,11 @@
             const isP = r.type === 'plus';
             net += isP ? r.amt : -r.amt;
             dIn += isP ? r.amt : 0; dOut += isP ? 0 : r.amt;
-            history.innerHTML += `<div class="log-item" style="border-left-color:${isP?'#00b894':'#eb4d4b'}">
-                <div><b>${r.name}</b><br><small style="color:#a29bfe;">${r.catName}</small></div>
+            history.innerHTML += `<div class="log-item" style="border-left-color:${isP?'var(--income)':'var(--expense)'}">
+                <div><b>${r.name}</b><br><small style="color:#9ca3af;">${r.catName}</small></div>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <b style="color:${isP?'#55efc4':'#ff7675'};">${isP?'+':'-'}${r.amt.toLocaleString()}</b>
-                    ${isAdmin ? `<button style="color:#ff7675; border:none; background:none; font-size:1.2rem;" onclick="window.deleteRec('${r.id}')">✖</button>` : ''}
+                    <b style="color:${isP?'#34d399':'#f87171'};">${isP?'+':'-'}${r.amt.toLocaleString()}</b>
+                    ${isAdmin ? `<button style="color:#ef4444; border:none; background:none; font-size:1.2rem; cursor:pointer;" onclick="window.deleteRec('${r.id}')">✕</button>` : ''}
                 </div></div>`;
         });
         document.getElementById('totalDisplay').innerText = (openingBal + net).toLocaleString();
@@ -221,7 +329,14 @@
         document.getElementById('dayOutDisplay').innerText = "-" + dOut.toLocaleString();
     }
 
-    // Login logic
+    window.switchNewCatType = (type) => {
+        newCatType = type;
+        const pBtn = document.getElementById('typePlus');
+        const mBtn = document.getElementById('typeMinus');
+        pBtn.className = 'type-btn' + (type === 'plus' ? ' active plus' : '');
+        mBtn.className = 'type-btn' + (type === 'minus' ? ' active minus' : '');
+    };
+
     document.getElementById('loginBtn').onclick = () => {
         const u = document.getElementById('userInput').value;
         const p = document.getElementById('passInput').value;
@@ -238,7 +353,6 @@
         renderUI();
     }
 
-    // Record saving
     document.getElementById('saveBtn').onclick = async () => {
         const amt = parseFloat(document.getElementById('itemAmt').value);
         if(!amt) return alert("ပမာဏ ထည့်ပါ");
@@ -250,7 +364,6 @@
         document.getElementById('itemAmt').value = ''; document.getElementById('itemName').value = '';
     };
 
-    // Annual Report logic
     document.getElementById('annualReportBtn').onclick = () => {
         let mData = Array(12).fill(0).map(() => ({ in: 0, out: 0 }));
         records.forEach(r => {
@@ -259,13 +372,12 @@
         });
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
         document.getElementById('annualBody').innerHTML = mData.map((m, i) => `
-            <tr><td>${months[i]}</td><td style="color:#55efc4">${m.in.toLocaleString()}</td>
-            <td style="color:#ff7675">${m.out.toLocaleString()}</td><td>${(m.in-m.out).toLocaleString()}</td></tr>
+            <tr><td>${months[i]}</td><td style="color:var(--income)">${m.in.toLocaleString()}</td>
+            <td style="color:var(--expense)">${m.out.toLocaleString()}</td><td style="font-weight:bold;">${(m.in-m.out).toLocaleString()}</td></tr>
         `).join('');
         document.getElementById('annualModal').style.display = 'flex';
     };
 
-    // Settings logic
     document.getElementById('settingBtn').onclick = () => {
         document.getElementById('openingBalInput').value = openingBal;
         document.getElementById('setAdminUser').value = loginConfigs.admin.u;
@@ -278,9 +390,9 @@
 
     function renderEditCats() {
         document.getElementById('catEditList').innerHTML = categories.map(c => `
-            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #334155; align-items:center;">
-                <span>${c.icon} ${c.name}</span>
-                <span style="color:#ff7675; cursor:pointer;" onclick="window.removeCat(${c.id})">ဖျက်</span>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #1f2937; align-items:center;">
+                <span style="color:${c.type==='plus'?'var(--income)':'var(--expense)'}">${c.icon} ${c.name}</span>
+                <span style="color:var(--expense); cursor:pointer;" onclick="window.removeCat(${c.id})">✕</span>
             </div>`).join('');
     }
 
@@ -294,8 +406,9 @@
     document.getElementById('addCatBtn').onclick = async () => {
         const name = document.getElementById('newCatName').value;
         if(!name) return alert("အမည် ထည့်ပါ");
-        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "📦", name, type: "plus" });
+        categories.push({ id: Date.now(), icon: document.getElementById('newCatIcon').value || "📦", name, type: newCatType });
         await saveAllConfig(); renderEditCats(); renderUI();
+        document.getElementById('newCatName').value = '';
     };
 
     document.getElementById('saveAccBtn').onclick = async () => {
@@ -303,7 +416,9 @@
         loginConfigs.admin.p = document.getElementById('setAdminPass').value;
         loginConfigs.staff.u = document.getElementById('setStaffUser').value;
         loginConfigs.staff.p = document.getElementById('setStaffPass').value;
-        await saveAllConfig(); alert("Accounts Saved!");
+        await saveAllConfig();
+        alert("🛡️ Security Updates Applied Successfully!");
+        document.getElementById('accUpdateModal').style.display = 'none';
     };
 
     document.getElementById('saveOpenBtn').onclick = async () => {
@@ -315,11 +430,10 @@
     document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
     window.setCat = (id) => { selectedCatId = id; renderUI(); };
 
-    // Status Checker
     setInterval(() => {
         const dot = document.getElementById('statusIndicator');
-        if(navigator.onLine) { dot.className="online"; dot.innerText="Online 🟢"; }
-        else { dot.className="offline"; dot.innerText="Offline 🔴"; }
+        if(navigator.onLine) { dot.className="online"; dot.innerText="Online"; }
+        else { dot.className="offline"; dot.innerText="Offline"; }
     }, 2000);
 </script>
 </body>
